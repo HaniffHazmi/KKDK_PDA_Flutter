@@ -22,22 +22,22 @@ class ParcelService {
       'block': parcel.block.name,
       'level': parcel.level.name,
       'roomNumber': parcel.roomNumber,
+      'status': parcelStatusToString(parcel.status),
       'userId': user.uid,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
 
-  /// Get list of parcels for current user (e.g. pending)
-  Stream<List<Parcel>> getUserParcels({bool foundOnly = false}) {
+  /// Get list of parcels for current user
+  Stream<List<Parcel>> getUserParcels({ParcelStatus? filterStatus}) {
     final user = _auth.currentUser;
     if (user == null) throw Exception('User not logged in');
 
     Query query = _parcelCollection.where('userId', isEqualTo: user.uid);
 
-    // You can extend this to filter found status, once added
-    // if (foundOnly) {
-    //   query = query.where('found', isEqualTo: true);
-    // }
+    if (filterStatus != null) {
+      query = query.where('status', isEqualTo: parcelStatusToString(filterStatus));
+    }
 
     return query.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -51,6 +51,9 @@ class ParcelService {
           block: Block.values.firstWhere((b) => b.name == data['block']),
           level: Level.values.firstWhere((l) => l.name == data['level']),
           roomNumber: data['roomNumber'],
+          status: data['status'] != null
+              ? parcelStatusFromString(data['status'])
+              : ParcelStatus.pending,
         );
       }).toList();
     });

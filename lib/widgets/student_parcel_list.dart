@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../widgets/parcel_tile.dart';  // Import the new widget
 
 class StudentParcelList extends StatelessWidget {
   @override
@@ -18,22 +19,33 @@ class StudentParcelList extends StatelessWidget {
           .orderBy('createdAt', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting)
-          return Center(child: CircularProgressIndicator());
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
 
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty)
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          print('No parcels found for user $uid');
           return Center(child: Text("No parcels found"));
+        }
 
         final parcels = snapshot.data!.docs;
+        print('Parcels count: ${parcels.length}');
 
         return ListView.builder(
           itemCount: parcels.length,
           itemBuilder: (context, index) {
             final parcel = parcels[index];
-            return ListTile(
-              title: Text(parcel['trackingNumber']),
-              subtitle: Text('${parcel['college']} - Room ${parcel['roomNumber']}'),
-              trailing: Text(parcel['status']),
+            final data = parcel.data() as Map<String, dynamic>;
+
+            return ParcelTile(
+              trackingNumber: data['trackingNumber'],
+              college: data['college'],
+              roomNumber: data['roomNumber'],
+              status: data['status'] ?? 'unknown',
             );
           },
         );
@@ -41,3 +53,4 @@ class StudentParcelList extends StatelessWidget {
     );
   }
 }
+
