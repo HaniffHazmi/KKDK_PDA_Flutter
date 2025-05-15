@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "4427713198",
+    "firebase_url": "https://kkdkparcel-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "kkdkparcel",
+    "storage_bucket": "kkdkparcel.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4427713198:android:d8390271a96d0cebc47b3f",
+        "android_client_info": {
+          "package_name": "com.example.kkdk.flutterapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvC62GmBbxo1A5rCplAYW_izaPxCyKkGk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
