@@ -1,50 +1,59 @@
-enum College { TunFatimah, TunDrIsmail }
-enum Block { A, B, C, D }
-enum Level { Zero, One, Two, Three }
-
 enum ParcelStatus {
-  pending,         // Submitted by user, not yet processed
-  found,           // Admin located the parcel
-  awaitingPayment, // Waiting for student to pay
-  delivered        // Student has received parcel
+  pending,
+  found,
+  awaitPayment,
+  delivered,
 }
 
-ParcelStatus parcelStatusFromString(String status) {
-  return ParcelStatus.values.firstWhere(
-        (e) => e.toString().split('.').last.toLowerCase() == status.toLowerCase(),
-    orElse: () => ParcelStatus.pending,
-  );
-}
-
-String parcelStatusToString(ParcelStatus status) {
-  return status.toString().split('.').last;
+enum Courier {
+  jnt,
+  shopeeXpress,
+  flash,
+  posLaju,
+  gdex,
 }
 
 class Parcel {
-  String trackingNumber;
-  String name;
-  String matricNumber;
-  String phoneNumber;
-  College college;
-  Block block;
-  Level level;
-  int roomNumber;
-  ParcelStatus status; // 🔥 New field
+  final String id; // Firestore document ID
+  final String userId; // Firebase UID of student
+  final String trackingNumber;
+  final Courier courier;
+  final DateTime dateArrived;
+  final ParcelStatus status;
 
   Parcel({
+    required this.id,
+    required this.userId,
     required this.trackingNumber,
-    required this.name,
-    required this.matricNumber,
-    required this.phoneNumber,
-    required this.college,
-    required this.block,
-    required this.level,
-    required this.roomNumber,
-    this.status = ParcelStatus.pending, // Default to pending
+    required this.courier,
+    required this.dateArrived,
+    this.status = ParcelStatus.pending,
   });
 
-  // Add validation for room number here (only 1-16)
-  static bool isValidRoomNumber(int roomNumber) {
-    return roomNumber >= 1 && roomNumber <= 16;
+  Map<String, dynamic> toMap() {
+    return {
+      'userId': userId,
+      'trackingNumber': trackingNumber,
+      'courier': courier.name, // save enum as string
+      'dateArrived': dateArrived.toIso8601String(),
+      'status': status.name, // save enum as string
+    };
+  }
+
+  factory Parcel.fromMap(String id, Map<String, dynamic> map) {
+    return Parcel(
+      id: id,
+      userId: map['userId'] ?? '',
+      trackingNumber: map['trackingNumber'] ?? '',
+      courier: Courier.values.firstWhere(
+            (e) => e.name == map['courier'],
+        orElse: () => Courier.jnt,
+      ),
+      dateArrived: DateTime.parse(map['dateArrived']),
+      status: ParcelStatus.values.firstWhere(
+            (e) => e.name == map['status'],
+        orElse: () => ParcelStatus.pending,
+      ),
+    );
   }
 }

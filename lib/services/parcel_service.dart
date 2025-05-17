@@ -13,22 +13,10 @@ class ParcelService {
     final user = _auth.currentUser;
     if (user == null) throw Exception('User not logged in');
 
-    await _parcelCollection.add({
-      'trackingNumber': parcel.trackingNumber,
-      'name': parcel.name,
-      'matricNumber': parcel.matricNumber,
-      'phoneNumber': parcel.phoneNumber,
-      'college': parcel.college.name,
-      'block': parcel.block.name,
-      'level': parcel.level.name,
-      'roomNumber': parcel.roomNumber,
-      'status': parcelStatusToString(parcel.status),
-      'userId': user.uid,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    await _parcelCollection.add(parcel.toMap());
   }
 
-  /// Get list of parcels for current user
+  /// Get list of parcels for current user (optionally filtered by status)
   Stream<List<Parcel>> getUserParcels({ParcelStatus? filterStatus}) {
     final user = _auth.currentUser;
     if (user == null) throw Exception('User not logged in');
@@ -36,26 +24,42 @@ class ParcelService {
     Query query = _parcelCollection.where('userId', isEqualTo: user.uid);
 
     if (filterStatus != null) {
-      query = query.where('status', isEqualTo: parcelStatusToString(filterStatus));
+      query = query.where('status', isEqualTo: filterStatus.name);
     }
 
     return query.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
-        return Parcel(
-          trackingNumber: data['trackingNumber'],
-          name: data['name'],
-          matricNumber: data['matricNumber'],
-          phoneNumber: data['phoneNumber'],
-          college: College.values.firstWhere((c) => c.name == data['college']),
-          block: Block.values.firstWhere((b) => b.name == data['block']),
-          level: Level.values.firstWhere((l) => l.name == data['level']),
-          roomNumber: data['roomNumber'],
-          status: data['status'] != null
-              ? parcelStatusFromString(data['status'])
-              : ParcelStatus.pending,
-        );
+        return Parcel.fromMap(doc.id, data);
       }).toList();
     });
+  }
+
+  /// Get all parcels (admin use)
+  Stream<List<Parcel>> getAllParcels({ParcelStatus? filterStatus}) {
+    Query query = _parcelCollection;
+
+    if (filterStatus != null) {
+      query = query.where('status', isEqualTo: filterStatus.name);
+    }
+
+    return query.snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return Parcel.fromMap(doc.id, data);
+      }).toList();
+    });
+  }
+
+  /// Update parcel status (admin use)
+  Future<void> updateParcelStatus(String parcelId, ParcelStatus status) async {
+    await _parcelCollection.doc(parcelId).update({
+      'status': status.name,
+    });
+  }
+
+  /// Optional: Delete a parcel (admin or owner)
+  Future<void> deleteParcel(String parcelId) async {
+    await _parcelCollection.doc(parcelId).delete();
   }
 }
