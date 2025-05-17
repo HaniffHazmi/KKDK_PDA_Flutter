@@ -12,11 +12,12 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _trackingNumberController = TextEditingController();
   Courier? _selectedCourier;
+  DateTime? _selectedDate;
   bool _isSubmitting = false;
   final ParcelService _parcelService = ParcelService();
 
   Future<void> _submitForm() async {
-    if (_formKey.currentState?.validate() ?? false) {
+    if (_formKey.currentState?.validate() ?? false && _selectedDate != null) {
       setState(() => _isSubmitting = true);
 
       final user = FirebaseAuth.instance.currentUser;
@@ -34,7 +35,10 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
           userId: user.uid,
           trackingNumber: _trackingNumberController.text.trim(),
           courier: _selectedCourier!,
-          dateArrived: DateTime.now(),
+          dateArrived: _selectedDate!,
+          arrivedDay: _selectedDate!.day,
+          arrivedMonth: _selectedDate!.month,
+          arrivedYear: _selectedDate!.year,
           status: ParcelStatus.pending,
         );
 
@@ -43,6 +47,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
         _formKey.currentState?.reset();
         setState(() {
           _selectedCourier = null;
+          _selectedDate = null;
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -55,6 +60,25 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
       } finally {
         setState(() => _isSubmitting = false);
       }
+    } else if (_selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select a date arrived')),
+      );
+    }
+  }
+
+  Future<void> _pickDate(BuildContext context) async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: DateTime(now.year - 1),
+      lastDate: now,
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
     }
   }
 
@@ -106,6 +130,25 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                 validator: (value) =>
                 value == null ? 'Please select a courier' : null,
               ),
+              SizedBox(height: 16),
+
+              // Date Picker Button
+              Row(
+                children: [
+                  Text(
+                    _selectedDate == null
+                        ? 'No date selected'
+                        : 'Date: ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+                  ),
+                  Spacer(),
+                  TextButton.icon(
+                    onPressed: () => _pickDate(context),
+                    icon: Icon(Icons.calendar_today),
+                    label: Text('Pick Date'),
+                  ),
+                ],
+              ),
+
               SizedBox(height: 24),
 
               // Submit Button

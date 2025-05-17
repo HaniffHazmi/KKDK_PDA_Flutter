@@ -19,6 +19,9 @@ class Parcel {
   final String trackingNumber;
   final Courier courier;
   final DateTime dateArrived;
+  final int arrivedDay;
+  final int arrivedMonth;
+  final int arrivedYear;
   final ParcelStatus status;
 
   Parcel({
@@ -27,20 +30,29 @@ class Parcel {
     required this.trackingNumber,
     required this.courier,
     required this.dateArrived,
+    required this.arrivedDay,
+    required this.arrivedMonth,
+    required this.arrivedYear,
     this.status = ParcelStatus.pending,
   });
 
+  /// Convert to Firestore-compatible map
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
       'trackingNumber': trackingNumber,
-      'courier': courier.name, // save enum as string
+      'courier': courier.name,
       'dateArrived': dateArrived.toIso8601String(),
-      'status': status.name, // save enum as string
+      'arrivedDay': arrivedDay,
+      'arrivedMonth': arrivedMonth,
+      'arrivedYear': arrivedYear,
+      'status': status.name,
     };
   }
 
+  /// Construct from Firestore snapshot
   factory Parcel.fromMap(String id, Map<String, dynamic> map) {
+    final parsedDate = DateTime.parse(map['dateArrived']);
     return Parcel(
       id: id,
       userId: map['userId'] ?? '',
@@ -49,7 +61,10 @@ class Parcel {
             (e) => e.name == map['courier'],
         orElse: () => Courier.jnt,
       ),
-      dateArrived: DateTime.parse(map['dateArrived']),
+      dateArrived: parsedDate,
+      arrivedDay: map['arrivedDay'] ?? parsedDate.day,
+      arrivedMonth: map['arrivedMonth'] ?? parsedDate.month,
+      arrivedYear: map['arrivedYear'] ?? parsedDate.year,
       status: ParcelStatus.values.firstWhere(
             (e) => e.name == map['status'],
         orElse: () => ParcelStatus.pending,
