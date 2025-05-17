@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/parcel.dart';
 import '../services/parcel_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class ParcelFormScreen extends StatefulWidget {
   @override
@@ -14,30 +14,31 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
   final _matricNumberController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _roomNumberController = TextEditingController();
+
   final ParcelService _parcelService = ParcelService();
 
   College? _selectedCollege;
   Block? _selectedBlock;
   Level? _selectedLevel;
+  Courier? _selectedCourier;
+  DateTime? _selectedDate;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _isSubmitting = false; // Track submission state
+  bool _isSubmitting = false;
 
   Future<void> _submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
-        _isSubmitting = true; // Disable button while submitting
+        _isSubmitting = true;
       });
 
       final user = FirebaseAuth.instance.currentUser;
-
       if (user == null) {
-        // Handle unauthenticated state
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('User not logged in')),
         );
         setState(() {
-          _isSubmitting = false; // Re-enable button on failure
+          _isSubmitting = false;
         });
         return;
       }
@@ -51,20 +52,20 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
         block: _selectedBlock!,
         level: _selectedLevel!,
         roomNumber: int.parse(_roomNumberController.text.trim()),
+        courier: _selectedCourier!,
+        dateArrived: _selectedDate!,
       );
 
       try {
-        // Add the parcel using the ParcelService (already handles Firestore)
         await _parcelService.addParcel(newParcel);
-
-        // Clear form and reset state
         _formKey.currentState?.reset();
         setState(() {
           _selectedCollege = null;
           _selectedBlock = null;
           _selectedLevel = null;
+          _selectedCourier = null;
+          _selectedDate = null;
         });
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Parcel submitted successfully')),
         );
@@ -74,7 +75,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
         );
       } finally {
         setState(() {
-          _isSubmitting = false; // Re-enable button after submission
+          _isSubmitting = false;
         });
       }
     }
@@ -93,117 +94,69 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Tracking Number
                   TextFormField(
                     controller: _trackingNumberController,
                     decoration: InputDecoration(labelText: 'Tracking Number'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Tracking number is required';
-                      }
-                      return null;
-                    },
+                    validator: (value) =>
+                    value == null || value.isEmpty ? 'Tracking number is required' : null,
                   ),
-                  // Name
                   TextFormField(
                     controller: _nameController,
                     decoration: InputDecoration(labelText: 'Name'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Name is required';
-                      }
-                      return null;
-                    },
+                    validator: (value) =>
+                    value == null || value.isEmpty ? 'Name is required' : null,
                   ),
-                  // Matric Number
                   TextFormField(
                     controller: _matricNumberController,
                     decoration: InputDecoration(labelText: 'Matric Number'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Matric number is required';
-                      }
-                      return null;
-                    },
+                    validator: (value) =>
+                    value == null || value.isEmpty ? 'Matric number is required' : null,
                   ),
-                  // Phone Number
                   TextFormField(
                     controller: _phoneNumberController,
                     decoration: InputDecoration(labelText: 'Phone Number'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Phone number is required';
-                      }
-                      return null;
-                    },
+                    validator: (value) =>
+                    value == null || value.isEmpty ? 'Phone number is required' : null,
                   ),
-                  // College Dropdown
                   DropdownButtonFormField<College>(
                     value: _selectedCollege,
                     decoration: InputDecoration(labelText: 'College'),
                     items: College.values.map((college) {
-                      return DropdownMenuItem<College>(
+                      return DropdownMenuItem(
                         value: college,
                         child: Text(college.toString().split('.').last),
                       );
                     }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedCollege = value;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please select a college';
-                      }
-                      return null;
-                    },
+                    onChanged: (value) => setState(() => _selectedCollege = value),
+                    validator: (value) =>
+                    value == null ? 'Please select a college' : null,
                   ),
-                  // Block Dropdown
                   DropdownButtonFormField<Block>(
                     value: _selectedBlock,
                     decoration: InputDecoration(labelText: 'Block'),
                     items: Block.values.map((block) {
-                      return DropdownMenuItem<Block>(
+                      return DropdownMenuItem(
                         value: block,
                         child: Text(block.toString().split('.').last),
                       );
                     }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedBlock = value;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please select a block';
-                      }
-                      return null;
-                    },
+                    onChanged: (value) => setState(() => _selectedBlock = value),
+                    validator: (value) =>
+                    value == null ? 'Please select a block' : null,
                   ),
-                  // Level Dropdown
                   DropdownButtonFormField<Level>(
                     value: _selectedLevel,
                     decoration: InputDecoration(labelText: 'Level'),
                     items: Level.values.map((level) {
-                      return DropdownMenuItem<Level>(
+                      return DropdownMenuItem(
                         value: level,
-                        child: Text(level.toString().split('.').last),
+                        child: Text(level.index.toString()), // Show 0, 1, 2, 3
                       );
                     }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedLevel = value;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please select a level';
-                      }
-                      return null;
-                    },
+                    onChanged: (value) => setState(() => _selectedLevel = value),
+                    validator: (value) =>
+                    value == null ? 'Please select a level' : null,
                   ),
-                  // Room Number
                   TextFormField(
                     controller: _roomNumberController,
                     decoration: InputDecoration(labelText: 'Room Number'),
@@ -212,19 +165,59 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Room number is required';
                       }
-                      int roomNumber = int.parse(value);
-                      if (!Parcel.isValidRoomNumber(roomNumber)) {
+                      int room = int.tryParse(value) ?? 0;
+                      if (!Parcel.isValidRoomNumber(room)) {
                         return 'Room number must be between 1 and 16';
                       }
                       return null;
                     },
                   ),
+                  DropdownButtonFormField<Courier>(
+                    value: _selectedCourier,
+                    decoration: InputDecoration(labelText: 'Courier'),
+                    items: Courier.values.map((courier) {
+                      return DropdownMenuItem(
+                        value: courier,
+                        child: Text(courier.toString().split('.').last),
+                      );
+                    }).toList(),
+                    onChanged: (value) => setState(() => _selectedCourier = value),
+                    validator: (value) =>
+                    value == null ? 'Please select a courier' : null,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2023),
+                        lastDate: DateTime.now(),
+                      );
+                      if (picked != null) {
+                        setState(() => _selectedDate = picked);
+                      }
+                    },
+                    child: AbsorbPointer(
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          labelText: 'Date Arrived',
+                          hintText: 'Select date',
+                        ),
+                        controller: TextEditingController(
+                          text: _selectedDate != null
+                              ? "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}"
+                              : '',
+                        ),
+                        validator: (value) =>
+                        _selectedDate == null ? 'Please select a date' : null,
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 20),
-                  // Submit Button
                   ElevatedButton(
-                    onPressed: _isSubmitting ? null : _submitForm, // Disable while submitting
+                    onPressed: _isSubmitting ? null : _submitForm,
                     child: _isSubmitting
-                        ? CircularProgressIndicator() // Show loading spinner
+                        ? CircularProgressIndicator()
                         : Text('Submit Parcel'),
                   ),
                 ],

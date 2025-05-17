@@ -1,23 +1,47 @@
 enum College { TunFatimah, TunDrIsmail }
-enum Block { A, B, C, D }
-enum Level { Zero, One, Two, Three }
 
-enum ParcelStatus {
-  pending,         // Submitted by user, not yet processed
-  found,           // Admin located the parcel
-  awaitingPayment, // Waiting for student to pay
-  delivered        // Student has received parcel
+enum Block { A, B, C, D }
+
+/// Updated Level enum with values 0 to 3
+enum Level {
+  zero(0),
+  one(1),
+  two(2),
+  three(3);
+
+  final int value;
+  const Level(this.value);
 }
 
+/// Parcel status for lifecycle tracking
+enum ParcelStatus {
+  pending,
+  found,
+  awaitingPayment,
+  delivered,
+}
+
+/// Courier options
+enum Courier {
+  jnt,
+  flash,
+  spx,
+  poslaju,
+  gdex,
+  ninjavan,
+}
+
+// Convert string to ParcelStatus enum
 ParcelStatus parcelStatusFromString(String status) {
   return ParcelStatus.values.firstWhere(
-        (e) => e.toString().split('.').last.toLowerCase() == status.toLowerCase(),
+        (e) => e.name.toLowerCase() == status.toLowerCase(),
     orElse: () => ParcelStatus.pending,
   );
 }
 
+// Convert ParcelStatus enum to string
 String parcelStatusToString(ParcelStatus status) {
-  return status.toString().split('.').last;
+  return status.name;
 }
 
 class Parcel {
@@ -29,7 +53,9 @@ class Parcel {
   Block block;
   Level level;
   int roomNumber;
-  ParcelStatus status; // 🔥 New field
+  Courier courier;               // ✅ New
+  DateTime dateArrived;          // ✅ New
+  ParcelStatus status;
 
   Parcel({
     required this.trackingNumber,
@@ -40,10 +66,12 @@ class Parcel {
     required this.block,
     required this.level,
     required this.roomNumber,
-    this.status = ParcelStatus.pending, // Default to pending
+    required this.courier,
+    required this.dateArrived,
+    this.status = ParcelStatus.pending,
   });
 
-  // Add validation for room number here (only 1-16)
+  /// Room number constraint: 1 to 16
   static bool isValidRoomNumber(int roomNumber) {
     return roomNumber >= 1 && roomNumber <= 16;
   }

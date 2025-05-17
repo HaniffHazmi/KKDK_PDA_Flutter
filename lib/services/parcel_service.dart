@@ -22,6 +22,8 @@ class ParcelService {
       'block': parcel.block.name,
       'level': parcel.level.name,
       'roomNumber': parcel.roomNumber,
+      'courier': parcel.courier.name,
+      'dateArrived': Timestamp.fromDate(parcel.dateArrived),
       'status': parcelStatusToString(parcel.status),
       'userId': user.uid,
       'createdAt': FieldValue.serverTimestamp(),
@@ -51,6 +53,8 @@ class ParcelService {
           block: Block.values.firstWhere((b) => b.name == data['block']),
           level: Level.values.firstWhere((l) => l.name == data['level']),
           roomNumber: data['roomNumber'],
+          courier: Courier.values.firstWhere((c) => c.name == data['courier']),
+          dateArrived: (data['dateArrived'] as Timestamp).toDate(),
           status: data['status'] != null
               ? parcelStatusFromString(data['status'])
               : ParcelStatus.pending,
