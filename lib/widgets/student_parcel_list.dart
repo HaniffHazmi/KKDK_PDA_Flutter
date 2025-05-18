@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../widgets/parcel_tile.dart';  // Import the new widget
 
 class StudentParcelList extends StatelessWidget {
+  const StudentParcelList({super.key});
+
   @override
   Widget build(BuildContext context) {
     final String? uid = FirebaseAuth.instance.currentUser?.uid;
