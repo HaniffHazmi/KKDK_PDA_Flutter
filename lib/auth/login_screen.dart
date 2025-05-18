@@ -23,22 +23,39 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
 
+      final email = _emailController.text.trim();
+
+      // Check if user is an admin
+      final adminDoc = await FirebaseFirestore.instance
+          .collection('admins')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (adminDoc.docs.isNotEmpty) {
+        print('Admin logged in: ${adminDoc.docs.first.data()}');
+        Navigator.pushReplacementNamed(context, '/admin-dashboard');
+        return;
+      }
+
+      // If not admin, proceed with normal user logic
       final uid = userCredential.user?.uid;
 
       if (uid != null) {
-        final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .get();
+
         if (userDoc.exists) {
           print('Student Data: ${userDoc.data()}');
-          // TODO: Optionally store user info in a provider or shared state
+          Navigator.pushReplacementNamed(context, '/home');
         } else {
           setState(() {
             _errorMessage = 'Student profile not found in Firestore.';
           });
-          return;
         }
       }
-
-      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       setState(() {
         _errorMessage = 'Login failed: ${e.toString()}';
