@@ -53,8 +53,8 @@ class Parcel {
   Block block;
   Level level;
   int roomNumber;
-  Courier courier;               // ✅ New
-  DateTime dateArrived;          // ✅ New
+  Courier courier;
+  DateTime dateArrived;
   ParcelStatus status;
 
   Parcel({
