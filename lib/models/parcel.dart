@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum College { TunFatimah, TunDrIsmail }
 
 enum Block { A, B, C, D }
@@ -44,6 +46,35 @@ String parcelStatusToString(ParcelStatus status) {
   return status.name;
 }
 
+College collegeFromString(String value) {
+  return College.values.firstWhere(
+        (e) => e.name.toLowerCase() == value.toLowerCase(),
+    orElse: () => College.TunFatimah,
+  );
+}
+
+Block blockFromString(String value) {
+  return Block.values.firstWhere(
+        (e) => e.name.toLowerCase() == value.toLowerCase(),
+    orElse: () => Block.A,
+  );
+}
+
+Level levelFromString(dynamic value) {
+  if (value is int) {
+    return Level.values.firstWhere((e) => e.value == value, orElse: () => Level.zero);
+  }
+  return Level.zero;
+}
+
+Courier courierFromString(String value) {
+  return Courier.values.firstWhere(
+        (e) => e.name.toLowerCase() == value.toLowerCase(),
+    orElse: () => Courier.jnt,
+  );
+}
+
+
 class Parcel {
   String trackingNumber;
   String name;
@@ -75,4 +106,8 @@ class Parcel {
   static bool isValidRoomNumber(int roomNumber) {
     return roomNumber >= 1 && roomNumber <= 16;
   }
+
+
 }
+
+
