@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/parcel.dart';
-import '../services/parcel_service.dart';
+import '../../models/parcel.dart';
+import '../../services/parcel_service.dart';
 
 class ParcelFormScreen extends StatefulWidget {
   @override

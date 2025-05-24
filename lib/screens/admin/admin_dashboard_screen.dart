@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/dashboard_drawer.dart'; // Import the drawer widget
 import 'manage_parcels_screen.dart';
-import '../../models/parcel.dart';
+
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});

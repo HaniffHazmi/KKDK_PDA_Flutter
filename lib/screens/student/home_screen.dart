@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutterapp/screens/parcel_form_screen.dart';
-import '../widgets/bottom_nav.dart';
-import '../widgets/student_parcel_list.dart';
+import 'package:flutterapp/screens/student/parcel_form_screen.dart';
+import 'package:flutterapp/screens/student/student_profile_screen.dart';
+import '../../widgets/bottom_nav.dart';
+import '../../widgets/student_parcel_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
     StudentParcelList(),
     ParcelFormScreen(), // Placeholder
     Center(child: Text('Cart Screen')), // Placeholder
-    Center(child: Text('Profile Screen')), // Placeholder
+    StudentProfileScreen(),
   ];
 
   void _onNavTapped(int index) {

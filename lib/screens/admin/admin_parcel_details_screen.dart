@@ -1,14 +1,31 @@
 import 'package:flutter/material.dart';
 import '../../models/admin_parcel.dart';
 import '../../models/parcel.dart';
+import '../../services/status_update_service.dart';
 
 class AdminParcelDetailsScreen extends StatelessWidget {
   final AdminParcel parcel;
 
-  const AdminParcelDetailsScreen({super.key, required this.parcel});
+  AdminParcelDetailsScreen({super.key, required this.parcel});
+
+  final StatusUpdateService statusUpdateService = StatusUpdateService();
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  Future<void> _updateStatus(BuildContext context, ParcelStatus newStatus) async {
+    try {
+      await statusUpdateService.updateParcelStatus(parcel.trackingNumber, newStatus);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Status updated to ${parcelStatusToString(newStatus)}')),
+      );
+      // Optionally: Navigate back or refresh UI
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status')),
+      );
+    }
   }
 
   @override
@@ -75,7 +92,7 @@ class AdminParcelDetailsScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 FilledButton(
-                  onPressed: () {}, // Add logic here
+                  onPressed: () => _updateStatus(context, ParcelStatus.found),
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.green,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -83,7 +100,7 @@ class AdminParcelDetailsScreen extends StatelessWidget {
                   child: const Text('Found', style: TextStyle(fontSize: 16)),
                 ),
                 FilledButton(
-                  onPressed: () {}, // Add logic here
+                  onPressed: () => _updateStatus(context, ParcelStatus.unfound),
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.red,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -105,15 +122,11 @@ class AdminParcelDetailsScreen extends StatelessWidget {
         children: [
           Expanded(
             flex: 3,
-            child: Text('$title:',
-                style: const TextStyle(fontWeight: FontWeight.w600)),
+            child: Text('$title:', style: const TextStyle(fontWeight: FontWeight.w600)),
           ),
           Expanded(
             flex: 5,
-            child: Text(value,
-                style: const TextStyle(
-                  color: Colors.black87,
-                )),
+            child: Text(value, style: const TextStyle(color: Colors.black87)),
           ),
         ],
       ),

@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 enum College { TunFatimah, TunDrIsmail }
 
@@ -19,7 +19,8 @@ enum Level {
 enum ParcelStatus {
   pending,
   found,
-  awaitingPayment,
+  unfound,
+  paid,
   delivered,
 }
 

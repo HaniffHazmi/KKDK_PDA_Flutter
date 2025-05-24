@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutterapp/screens/admin/admin_dashboard_screen.dart';
 import 'auth/login_screen.dart';
 import 'auth/register_screen.dart';
-import 'screens/home_screen.dart';  // Import the Home Screen
+import 'screens/student/home_screen.dart';  // Import the Home Screen
 import 'firebase_options.dart';
 
 void main() async {

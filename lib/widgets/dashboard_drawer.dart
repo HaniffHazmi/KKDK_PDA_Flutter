@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterapp/services/auth_service.dart';
 
 class DashboardDrawer extends StatelessWidget {
   final int selectedIndex;
@@ -54,6 +55,7 @@ class DashboardDrawer extends StatelessWidget {
             onTap: () {
               // TODO: Add logout logic here
               Navigator.pop(context);
+              AuthService.instance.logout(context);
             },
           ),
         ],
