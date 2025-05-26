@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/parcel_tile.dart';  // Import the new widget
 
+//This is the StudentParcelList class.
+//It uses the ParcelTile class and fetch the student submitted parcel in HomeScreen class.
+
 class StudentParcelList extends StatelessWidget {
   const StudentParcelList({super.key});
 

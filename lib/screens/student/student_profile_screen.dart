@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../services/auth_service.dart';
 
+//This is the student profile screen. It has 3 button for now with only the logout function (for now).
+
 class StudentProfileScreen extends StatelessWidget {
   const StudentProfileScreen({super.key});
 

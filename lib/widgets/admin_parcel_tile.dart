@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+//This is the AdminParcelTile used by AdminParcelList
+
 class AdminParcelTile extends StatelessWidget {
   final String trackingNumber;
   final String college;

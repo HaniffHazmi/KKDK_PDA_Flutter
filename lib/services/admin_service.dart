@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/admin.dart';
 
+//This class is to handle admin login by searching for their credentials in Firebase.
+
 class AdminService {
   final CollectionReference _adminCollection =
   FirebaseFirestore.instance.collection('admins');

@@ -1,3 +1,5 @@
+//This is admin class
+
 class Admin {
   final String name;
   final String matricNumber;

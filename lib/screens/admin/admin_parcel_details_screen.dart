@@ -3,6 +3,8 @@ import '../../models/admin_parcel.dart';
 import '../../models/parcel.dart';
 import '../../services/status_update_service.dart';
 
+//This is the parcel details screen. Admin can see this when tapping a admin parcel tile.
+
 class AdminParcelDetailsScreen extends StatelessWidget {
   final AdminParcel parcel;
 

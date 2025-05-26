@@ -1,6 +1,8 @@
 // lib/widgets/parcel_tile.dart
 import 'package:flutter/material.dart';
 
+//This is the parcel tile class for StudentParcelList class.
+
 class ParcelTile extends StatelessWidget {
   final String trackingNumber;
   final String college;

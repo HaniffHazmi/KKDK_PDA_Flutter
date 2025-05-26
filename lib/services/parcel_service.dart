@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/parcel.dart';
 
+//This class is to help with ParcelFormScreen class.
+//It will help the submitted form to be saved into firebase.
+
 class ParcelService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;

@@ -6,6 +6,8 @@ import 'auth/register_screen.dart';
 import 'screens/student/home_screen.dart';  // Import the Home Screen
 import 'firebase_options.dart';
 
+//This is the main class.
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -22,6 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Auth App',
       initialRoute: '/login',
       routes: {

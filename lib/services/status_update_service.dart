@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/parcel.dart';
 
+//This class is to handle status update of the parcel.
+//Admin will update the parcel in AdminParcelDetailsScreen class.
+
 class StatusUpdateService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String collectionPath = 'parcels';

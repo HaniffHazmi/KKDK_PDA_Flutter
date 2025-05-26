@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+//This class is to ahndle logout for both admin and user.
+
 class AuthService {
   // Singleton pattern
   AuthService._privateConstructor();

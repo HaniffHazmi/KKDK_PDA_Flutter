@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutterapp/screens/admin/manage_payments_screen.dart';
 import '../../widgets/dashboard_drawer.dart'; // Import the drawer widget
 import 'manage_parcels_screen.dart';
-
+//This is the main dashboard page for admin.
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -16,7 +17,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   final List<Widget> _pages = [
     Center(child: Text('Dashboard Home', style: TextStyle(fontSize: 24))),
     ManageParcelsScreen(),
-    Center(child: Text('Student Payments', style: TextStyle(fontSize: 24))),
+    ManagePaymentsScreen(),
     Center(child: Text('Settings', style: TextStyle(fontSize: 24))),
   ];
 

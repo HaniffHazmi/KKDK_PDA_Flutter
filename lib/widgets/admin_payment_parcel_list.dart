@@ -1,22 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../models/admin_parcel.dart'; // Use AdminParcel
+import '../models/admin_parcel.dart';
 import '../models/parcel.dart';
 import 'admin_parcel_tile.dart';
 import '../screens/admin/admin_parcel_details_screen.dart';
 
-//This is the admin parcel list class.
-//This class is used to display all student parcel in ManageParcelsScreen class for admin.
+// This widget shows parcels with status 'found' (awaiting student payment).
 
-class AdminParcelList extends StatelessWidget {
-  const AdminParcelList({super.key});
+class AdminPaymentParcelList extends StatelessWidget {
+  const AdminPaymentParcelList({super.key});
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('parcels')
-          .where('status',isEqualTo: 'pending')
+          .where('status', isEqualTo: 'found') // ✅ Only found parcels
           .orderBy('createdAt', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
@@ -25,11 +24,11 @@ class AdminParcelList extends StatelessWidget {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(child: Text("No parcels found"));
+          return const Center(child: Text("No parcels awaiting payment"));
         }
 
         final parcelDocs = snapshot.data!.docs;

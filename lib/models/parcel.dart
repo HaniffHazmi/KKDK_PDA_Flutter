@@ -1,4 +1,4 @@
-
+//This is a parcel class that will be used by the students screen, service and widgets for student.
 
 enum College { TunFatimah, TunDrIsmail }
 
@@ -20,6 +20,7 @@ enum ParcelStatus {
   pending,
   found,
   unfound,
+  inDelivery,
   paid,
   delivered,
 }

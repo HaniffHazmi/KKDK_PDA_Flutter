@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutterapp/services/auth_service.dart';
 
+//This is the dashboard drawer class for navigation.
+//It is shared and used by admin screen only.
+
 class DashboardDrawer extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onItemSelected;

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../models/parcel.dart';
 import '../../widgets/admin_parcel_list.dart';
 
+//This is the admin parcel list page.
+//This page will fetch all of the parcel that has been submitted by student.
+
 class ManageParcelsScreen extends StatelessWidget {
   const ManageParcelsScreen({super.key});
 

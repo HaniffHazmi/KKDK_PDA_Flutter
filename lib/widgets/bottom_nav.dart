@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+//This is a shared bottom navbar.
+//It is shared and used for all student screen.
+
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
