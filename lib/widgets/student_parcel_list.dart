@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../widgets/parcel_tile.dart';  // Import the new widget
-
-//This is the StudentParcelList class.
-//It uses the ParcelTile class and fetch the student submitted parcel in HomeScreen class.
+import '../widgets/parcel_tile.dart';
+import '../models/parcel.dart'; // Make sure you import this to access enums and helpers
 
 class StudentParcelList extends StatelessWidget {
   const StudentParcelList({super.key});
@@ -33,17 +31,24 @@ class StudentParcelList extends StatelessWidget {
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          print('No parcels found for user $uid');
           return Center(child: Text("No parcels found"));
         }
 
-        final parcels = snapshot.data!.docs;
-        print('Parcels count: ${parcels.length}');
+        // Filter only parcels with status == pending
+        final pendingParcels = snapshot.data!.docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final status = parcelStatusFromString(data['status'] ?? 'pending');
+          return status == ParcelStatus.pending;
+        }).toList();
+
+        if (pendingParcels.isEmpty) {
+          return Center(child: Text("No pending parcels"));
+        }
 
         return ListView.builder(
-          itemCount: parcels.length,
+          itemCount: pendingParcels.length,
           itemBuilder: (context, index) {
-            final parcel = parcels[index];
+            final parcel = pendingParcels[index];
             final data = parcel.data() as Map<String, dynamic>;
 
             return ParcelTile(
@@ -58,4 +63,3 @@ class StudentParcelList extends StatelessWidget {
     );
   }
 }
-

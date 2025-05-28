@@ -6,6 +6,8 @@ import '../../services/parcel_service.dart';
 //The is the parcel form submission. Student fills in the form and it will be saved in Firebase.
 
 class ParcelFormScreen extends StatefulWidget {
+  const ParcelFormScreen({super.key});
+
   @override
   _ParcelFormScreenState createState() => _ParcelFormScreenState();
 }

@@ -1,4 +1,4 @@
-//This is a parcel class that will be used by the students screen, service and widgets for student.
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum College { TunFatimah, TunDrIsmail }
 
@@ -109,6 +109,23 @@ class Parcel {
     return roomNumber >= 1 && roomNumber <= 16;
   }
 
+  factory Parcel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+
+    return Parcel(
+      trackingNumber: data['trackingNumber'] ?? '',
+      name: data['name'] ?? '',
+      matricNumber: data['matricNumber'] ?? '',
+      phoneNumber: data['phoneNumber'] ?? '',
+      college: collegeFromString(data['college']),
+      block: blockFromString(data['block']),
+      level: levelFromString(data['level']),
+      roomNumber: data['roomNumber'] ?? 0,
+      courier: courierFromString(data['courier']),
+      dateArrived: (data['dateArrived'] as Timestamp).toDate(),
+      status: parcelStatusFromString(data['status']),
+    );
+  }
 
 }
 

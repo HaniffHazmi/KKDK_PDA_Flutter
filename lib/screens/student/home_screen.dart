@@ -3,6 +3,7 @@ import 'package:flutterapp/screens/student/parcel_form_screen.dart';
 import 'package:flutterapp/screens/student/student_profile_screen.dart';
 import '../../widgets/bottom_nav.dart';
 import '../../widgets/student_parcel_list.dart';
+import 'cart_screen.dart';
 //This is the home page for student screen. It includes list of parcel they have submitted with status of it.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _pages = [
     StudentParcelList(),
     ParcelFormScreen(), // Placeholder
-    Center(child: Text('Cart Screen')), // Placeholder
+    CartScreen(),
     StudentProfileScreen(),
   ];
 
