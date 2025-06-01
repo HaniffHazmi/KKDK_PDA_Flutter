@@ -38,10 +38,14 @@ class CartSummaryBar extends StatelessWidget {
                     final parcelIds = snapshot.data!.docs.map((doc) => doc.id).toList();
 
                     try {
-                      await PaymentService.initiateBulkPayment(parcelIds);
+                      await PaymentService.initiateBulkPayment(
+                        uid!,
+                        totalCost,
+                        parcelIds,
+                      );
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed to start payment: $e')),
+                        SnackBar(content: Text('Error: $e')),
                       );
                     }
                   },

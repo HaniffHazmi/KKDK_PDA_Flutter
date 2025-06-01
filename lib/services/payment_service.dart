@@ -2,13 +2,21 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PaymentService {
-  static Future<void> initiateBulkPayment(List<String> parcelIds) async {
+  static Future<void> initiateBulkPayment(
+      String userId,
+      double totalCost,
+      List<String> parcelIds,
+      ) async {
     final functions = FirebaseFunctions.instance;
 
     try {
       final result = await functions
           .httpsCallable('createSecurePaySession')
-          .call({'parcelIds': parcelIds});
+          .call({
+        'userId': userId,
+        'totalCost': totalCost,
+        'parcelIds': parcelIds,
+      });
 
       final paymentUrl = result.data['paymentUrl'];
 
@@ -19,7 +27,7 @@ class PaymentService {
       }
     } catch (e) {
       print('Payment initiation failed: $e');
-      rethrow; // Optional: let the UI handle the error
+      rethrow;
     }
   }
 }
