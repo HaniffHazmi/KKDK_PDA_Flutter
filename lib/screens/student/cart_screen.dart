@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterapp/payment/cart_summary_bar.dart';
 import '../../payment/cart_parcel_list.dart';
 
 class CartScreen extends StatelessWidget {
@@ -11,6 +12,7 @@ class CartScreen extends StatelessWidget {
         title: const Text('My Cart'),
       ),
       body: const CartParcelList(),
+      bottomNavigationBar: CartSummaryBar(),
     );
   }
 }

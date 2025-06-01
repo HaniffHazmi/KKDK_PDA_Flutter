@@ -26,17 +26,7 @@ class CartParcelTile extends StatelessWidget {
             const SizedBox(height: 4),
             Text('Arrived: ${parcel.dateArrived.toLocal().toString().split(' ')[0]}'),
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: onPay,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Pay'),
-              ),
-            ),
+
           ],
         ),
       ),

@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Parcel App'),
-        backgroundColor: const Color(0xFF42A2A2),
+        backgroundColor: Colors.blue,
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: AppBottomNavBar(
