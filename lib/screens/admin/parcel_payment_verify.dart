@@ -24,7 +24,7 @@ class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
   }
 
   Future<void> _loadPaymentProof() async {
-    final doc = await FirebaseFirestore.instance.collection('payments').doc(widget.paymentProofId).get();
+    final doc = await FirebaseFirestore.instance.collection('payment_proofs').doc(widget.paymentProofId).get();
     if (doc.exists) {
       setState(() {
         proof = PaymentProof.fromMap(doc.id, doc.data()!);
@@ -39,7 +39,7 @@ class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
     final batch = FirebaseFirestore.instance.batch();
 
     // 1. Update payment proof status
-    final paymentRef = FirebaseFirestore.instance.collection('payments').doc(proof!.id);
+    final paymentRef = FirebaseFirestore.instance.collection('payment_proofs').doc(proof!.id);
     batch.update(paymentRef, {'status': 'approved'});
 
     // 2. Update all parcels in the list
