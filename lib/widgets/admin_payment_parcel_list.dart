@@ -1,7 +1,6 @@
-// widgets/admin_payment_parcel_list.dart
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/payment_proof.dart';
 import 'admin_payment_parcel_tile.dart';
 
 class AdminPaymentParcelList extends StatelessWidget {
@@ -28,16 +27,14 @@ class AdminPaymentParcelList extends StatelessWidget {
           return const Center(child: Text("No pending payments."));
         }
 
-        final payments = snapshot.data!.docs;
+        final payments = snapshot.data!.docs.map((doc) {
+          return PaymentProof.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+        }).toList();
 
         return ListView.builder(
           itemCount: payments.length,
           itemBuilder: (context, index) {
-            final paymentProofId = payments[index].id;
-
-            return AdminPaymentParcelTile(
-              paymentProofId: paymentProofId,
-            );
+            return AdminPaymentParcelTile(paymentProof: payments[index]);
           },
         );
       },
