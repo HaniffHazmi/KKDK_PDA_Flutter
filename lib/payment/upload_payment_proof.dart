@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -45,14 +46,26 @@ class _UploadPaymentProofState extends State<UploadPaymentProof> {
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
       final filename = path.basename(_selectedImage!.path);
-      final ref = FirebaseStorage.instance
+      final storageRef = FirebaseStorage.instance
           .ref('payment_proofs/$uid/${DateTime.now().millisecondsSinceEpoch}_$filename');
 
-      await ref.putFile(_selectedImage!);
-      final downloadUrl = await ref.getDownloadURL();
+      await storageRef.putFile(_selectedImage!);
+      final downloadUrl = await storageRef.getDownloadURL();
 
-      // You can now save this URL and associated parcelIds in Firestore for admin verification.
-      // TODO: Save to Firestore
+      // Save the PaymentProof to Firestore
+      await FirebaseFirestore.instance.collection('payment_proofs').add({
+        'userId': uid,
+        'parcelIds': widget.parcelIds,
+        'fileUrl': downloadUrl,
+        'fileName': filename,
+        'uploadedAt': FieldValue.serverTimestamp(),
+        'status': 'pending',
+        'timestamp' : FieldValue.serverTimestamp()
+      });
+
+      print('Selected image path: ${_selectedImage!.path}');
+      print('Uploading to: payment_proofs/$uid/...');
+
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Payment proof uploaded successfully!')),
@@ -70,6 +83,7 @@ class _UploadPaymentProofState extends State<UploadPaymentProof> {
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
