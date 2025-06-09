@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterapp/payment/cart_summary_bar.dart';
+import 'package:flutterapp/screens/student/student_delivery_screen.dart';
 import '../../payment/cart_parcel_list.dart';
 
 class CartScreen extends StatelessWidget {
@@ -9,8 +10,25 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Cart'),
+        title: const Text('Payment Page'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const StudentDeliveryScreen(),
+                ),
+              );
+            },
+            child: const Text(
+              'Track Parcel',
+              style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
+
       body: const CartParcelList(),
       bottomNavigationBar: CartSummaryBar(),
     );

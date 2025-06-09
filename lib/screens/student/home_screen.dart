@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterapp/screens/student/parcel_form_screen.dart';
-import 'package:flutterapp/screens/student/student_profile_screen.dart';
+import 'package:flutterapp/screens/student/setting_screen.dart';
 import '../../widgets/bottom_nav.dart';
 import '../../widgets/student_parcel_list.dart';
 import 'cart_screen.dart';
@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     StudentParcelList(),
     ParcelFormScreen(), // Placeholder
     CartScreen(),
-    StudentProfileScreen(),
+    SettingScreen(),
   ];
 
   void _onNavTapped(int index) {
@@ -31,10 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Parcel App'),
-        backgroundColor: Colors.blue,
-      ),
+
       body: _pages[_selectedIndex],
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _selectedIndex,

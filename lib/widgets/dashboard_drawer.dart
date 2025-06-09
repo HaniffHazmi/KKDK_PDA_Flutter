@@ -46,8 +46,8 @@ class DashboardDrawer extends StatelessWidget {
             onTap: () => onItemSelected(2),
           ),
           ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
+            leading: const Icon(Icons.delivery_dining),
+            title: const Text('Delivery'),
             selected: selectedIndex == 3,
             onTap: () => onItemSelected(3),
           ),

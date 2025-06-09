@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterapp/screens/admin/admin_delivery_screen.dart';
 import 'package:flutterapp/screens/admin/manage_payments_screen.dart';
 import '../../widgets/dashboard_drawer.dart'; // Import the drawer widget
 import 'manage_parcels_screen.dart';
@@ -18,14 +19,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     Center(child: Text('Dashboard Home', style: TextStyle(fontSize: 24))),
     ManageParcelsScreen(),
     ManagePaymentsScreen(),
-    Center(child: Text('Settings', style: TextStyle(fontSize: 24))),
+    AdminDeliveryScreen(),
   ];
 
   final List<String> _titles = [
     'Dashboard',
     'Parcels',
     'Payments',
-    'Settings',
+    'Delivery',
   ];
 
   void _onSelectDrawerItem(int index) {

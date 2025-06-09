@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutterapp/screens/student/student_edit_profile_screen.dart';
+import 'package:flutterapp/screens/student/student_parcel_history_screen.dart';
 import '../../../services/auth_service.dart';
 
 //This is the student profile screen. It has 3 button for now with only the logout function (for now).
 
-class StudentProfileScreen extends StatelessWidget {
-  const StudentProfileScreen({super.key});
+class SettingScreen extends StatelessWidget {
+  const SettingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class StudentProfileScreen extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/edit-profile');
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => StudentEditProfileScreen()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
@@ -33,7 +35,7 @@ class StudentProfileScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/parcel-history');
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => StudentParcelHistoryScreen()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,

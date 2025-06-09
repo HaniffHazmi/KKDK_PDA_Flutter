@@ -98,7 +98,7 @@ class _UploadPaymentProofState extends State<UploadPaymentProof> {
           children: [
             Center(
               child: Image.asset(
-                'lib/assets/QR_Payment.jpg', // Make sure this exists
+                '../../assets/QR_Payment.jpg', // Make sure this exists
                 height: 200,
               ),
             ),

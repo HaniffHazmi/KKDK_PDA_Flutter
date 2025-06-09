@@ -29,12 +29,12 @@ class AppBottomNavBar extends StatelessWidget {
           label: 'Form',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.shopping_cart),
-          label: 'Cart',
+          icon: Icon(Icons.payment_rounded),
+          label: 'Payment',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
+          icon: Icon(Icons.settings),
+          label: 'Settings',
         ),
       ],
       type: BottomNavigationBarType.fixed,
