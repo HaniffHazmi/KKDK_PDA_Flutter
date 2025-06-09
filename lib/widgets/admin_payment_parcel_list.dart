@@ -11,7 +11,7 @@ class AdminPaymentParcelList extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('payment_proofs')
-          .where('status', isEqualTo: 'pending')
+          .where('status', isEqualTo: 'found')
           .orderBy('timestamp', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
