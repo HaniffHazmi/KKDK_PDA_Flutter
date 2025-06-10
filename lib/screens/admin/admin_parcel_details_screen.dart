@@ -3,8 +3,6 @@ import '../../models/admin_parcel.dart';
 import '../../models/parcel.dart';
 import '../../services/status_update_service.dart';
 
-//This is the parcel details screen. Admin can see this when tapping a admin parcel tile.
-
 class AdminParcelDetailsScreen extends StatelessWidget {
   final AdminParcel parcel;
 
@@ -22,10 +20,12 @@ class AdminParcelDetailsScreen extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Status updated to ${parcelStatusToString(newStatus)}')),
       );
-      // Optionally: Navigate back or refresh UI
+
+      // Redirect back to Admin Dashboard (assuming it's below in the navigation stack)
+      Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update status')),
+        const SnackBar(content: Text('Failed to update status')),
       );
     }
   }
@@ -43,7 +43,7 @@ class AdminParcelDetailsScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.blue,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -60,7 +60,7 @@ class AdminParcelDetailsScreen extends StatelessWidget {
                     Text('📦 Recipient Info',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
+                          color: Colors.blue,
                         )),
                     const SizedBox(height: 12),
                     _buildDetail('Name', parcel.name),
@@ -76,7 +76,7 @@ class AdminParcelDetailsScreen extends StatelessWidget {
                     Text('📄 Parcel Details',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
+                          color: Colors.blue,
                         )),
                     const SizedBox(height: 12),
                     _buildDetail('Tracking Number', parcel.trackingNumber),
