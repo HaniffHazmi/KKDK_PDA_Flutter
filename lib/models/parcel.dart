@@ -78,6 +78,7 @@ Courier courierFromString(String value) {
 
 
 class Parcel {
+  String id; // <-- Firestore document ID
   String trackingNumber;
   String name;
   String matricNumber;
@@ -91,6 +92,7 @@ class Parcel {
   ParcelStatus status;
 
   Parcel({
+    required this.id,
     required this.trackingNumber,
     required this.name,
     required this.matricNumber,
@@ -104,7 +106,6 @@ class Parcel {
     this.status = ParcelStatus.pending,
   });
 
-  /// Room number constraint: 1 to 16
   static bool isValidRoomNumber(int roomNumber) {
     return roomNumber >= 1 && roomNumber <= 16;
   }
@@ -113,6 +114,7 @@ class Parcel {
     final data = doc.data() as Map<String, dynamic>;
 
     return Parcel(
+      id: doc.id, // <-- Set the Firestore document ID
       trackingNumber: data['trackingNumber'] ?? '',
       name: data['name'] ?? '',
       matricNumber: data['matricNumber'] ?? '',
@@ -127,6 +129,22 @@ class Parcel {
     );
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'trackingNumber': trackingNumber,
+      'name': name,
+      'matricNumber': matricNumber,
+      'phoneNumber': phoneNumber,
+      'college': college.name,
+      'block': block.name,
+      'level': level.value,
+      'roomNumber': roomNumber,
+      'courier': courier.name,
+      'dateArrived': Timestamp.fromDate(dateArrived),
+      'status': parcelStatusToString(status),
+    };
+  }
 }
+
 
 

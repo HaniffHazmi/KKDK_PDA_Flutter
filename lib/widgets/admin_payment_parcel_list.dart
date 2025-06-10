@@ -11,8 +11,8 @@ class AdminPaymentParcelList extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('payment_proofs')
-          .where('status', isEqualTo: 'found')
-          .orderBy('timestamp', descending: true)
+          .where('isVerified', isEqualTo: false)
+          .orderBy('uploadedAt', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -28,7 +28,7 @@ class AdminPaymentParcelList extends StatelessWidget {
         }
 
         final payments = snapshot.data!.docs.map((doc) {
-          return PaymentProof.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+          return PaymentProof.fromFirestore(doc);
         }).toList();
 
         return ListView.builder(

@@ -1,45 +1,41 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 class PaymentProof {
-  final String id;
-  final String userId;
-  final List<String> parcelIds;
-  final String fileUrl;
-  final String fileName;
-  final DateTime uploadedAt;
-  final String status; // e.g. pending, approved, rejected
+  String id;
+  String parcelId; // <-- Firestore Parcel Document ID
+  String studentId;
+  String imageUrl;
+  DateTime uploadedAt;
+  bool isVerified;
 
   PaymentProof({
     required this.id,
-    required this.userId,
-    required this.parcelIds,
-    required this.fileUrl,
-    required this.fileName,
+    required this.parcelId,
+    required this.studentId,
+    required this.imageUrl,
     required this.uploadedAt,
-    required this.status,
+    this.isVerified = false,
   });
 
-  factory PaymentProof.fromMap(String id, Map<String, dynamic> data) {
+  factory PaymentProof.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
     return PaymentProof(
-      id: id,
-      userId: data['userId'],
-      parcelIds: List<String>.from(data['parcelIds'] ?? []),
-      fileUrl: data['fileUrl'],
-      fileName: data['fileName'],
+      id: doc.id,
+      parcelId: data['parcelId'] ?? '',
+      studentId: data['studentId'] ?? '',
+      imageUrl: data['imageUrl'] ?? '',
       uploadedAt: (data['uploadedAt'] as Timestamp).toDate(),
-      status: data['status'],
+      isVerified: data['isVerified'] ?? false,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'userId': userId,
-      'parcelIds': parcelIds,
-      'fileUrl': fileUrl,
-      'fileName': fileName,
+      'parcelId': parcelId,
+      'studentId': studentId,
+      'imageUrl': imageUrl,
       'uploadedAt': Timestamp.fromDate(uploadedAt),
-      'status': status,
+      'isVerified': isVerified,
     };
   }
 }

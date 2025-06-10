@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../models/parcel.dart';
 import '../../models/payment_proof.dart';
 
-
 class ParcelPaymentVerify extends StatefulWidget {
   final String paymentProofId;
 
@@ -16,6 +15,7 @@ class ParcelPaymentVerify extends StatefulWidget {
 class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
   PaymentProof? proof;
   bool isLoading = true;
+  Parcel? tiedParcel;
 
   @override
   void initState() {
@@ -24,12 +24,19 @@ class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
   }
 
   Future<void> _loadPaymentProof() async {
-    final doc = await FirebaseFirestore.instance.collection('payment_proofs').doc(widget.paymentProofId).get();
+    final doc = await FirebaseFirestore.instance
+        .collection('payment_proofs')
+        .doc(widget.paymentProofId)
+        .get();
+
     if (doc.exists) {
       setState(() {
-        proof = PaymentProof.fromMap(doc.id, doc.data()!);
+        proof = PaymentProof.fromFirestore(doc);
         isLoading = false;
       });
+      debugPrint('✅ Loaded PaymentProof: ${proof!.toMap()}');
+    } else {
+      debugPrint("❌ PaymentProof not found.");
     }
   }
 
@@ -37,35 +44,75 @@ class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
     if (proof == null) return;
 
     final batch = FirebaseFirestore.instance.batch();
+    debugPrint('🔍 Verifying parcel ID: ${proof!.parcelId}');
 
-    // 1. Update payment proof status
-    final paymentRef = FirebaseFirestore.instance.collection('payment_proofs').doc(proof!.id);
-    batch.update(paymentRef, {'status': 'approved'});
+    // Get parcel
+    final parcelDoc = await FirebaseFirestore.instance
+        .collection('parcels')
+        .doc(proof!.parcelId)
+        .get();
 
-    // 2. Update all parcels in the list
-    for (final parcelId in proof!.parcelIds) {
-      final parcelRef = FirebaseFirestore.instance.collection('parcels').doc(parcelId);
-      batch.update(parcelRef, {'status': parcelStatusToString(ParcelStatus.inDelivery)});
+    if (!parcelDoc.exists) {
+      debugPrint("❌ Parcel not found: ${proof!.parcelId}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Parcel not found: ${proof!.parcelId}')),
+      );
+      return;
     }
 
-    await batch.commit();
-    Navigator.pop(context);
+    // 1. Mark payment as verified
+    final paymentRef = FirebaseFirestore.instance
+        .collection('payment_proofs')
+        .doc(proof!.id);
+    batch.update(paymentRef, {'isVerified': true});
+
+    // 2. Update parcel status to "inDelivery"
+    final parcelRef = FirebaseFirestore.instance
+        .collection('parcels')
+        .doc(proof!.parcelId);
+    batch.update(parcelRef, {
+      'status': parcelStatusToString(ParcelStatus.inDelivery),
+    });
+
+    try {
+      await batch.commit();
+      Navigator.pop(context); // Go back after approval
+    } catch (e) {
+      debugPrint("❌ Error approving payment: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error approving payment: $e')),
+      );
+    }
   }
 
   Future<void> _rejectPayment() async {
     if (proof == null) return;
 
-    await FirebaseFirestore.instance.collection('payments').doc(proof!.id).update({
-      'status': 'rejected',
-    });
+    try {
+      await FirebaseFirestore.instance
+          .collection('payment_proofs')
+          .doc(proof!.id)
+          .delete(); // Or update with rejection flag
 
-    Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Payment has been rejected.')),
+      );
+
+      Navigator.pop(context);
+    } catch (e) {
+      debugPrint('❌ Error rejecting payment: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error rejecting payment: $e')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     if (isLoading || proof == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     return Scaffold(
@@ -76,14 +123,14 @@ class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
           children: [
             const Text('Receipt:', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Image.network(proof!.fileUrl, height: 250, fit: BoxFit.contain),
+            Image.network(proof!.imageUrl, height: 250, fit: BoxFit.contain),
             const SizedBox(height: 16),
-            Text('Uploaded by: ${proof!.userId}'),
-            Text('Uploaded at: ${proof!.uploadedAt.toLocal().toString().split(' ')[0]}'),
+            Text('Uploaded by: ${proof!.studentId}'),
+            Text('Uploaded at: ${proof!.uploadedAt.toLocal()}'),
             const SizedBox(height: 16),
-            const Text('Associated Parcels:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Associated Parcel:', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            ...proof!.parcelIds.map((id) => Text('• $id')),
+            Text('• ${proof!.parcelId}'),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

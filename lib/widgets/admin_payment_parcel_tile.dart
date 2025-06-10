@@ -16,15 +16,13 @@ class AdminPaymentParcelTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("User ID: ${paymentProof.userId}", style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text("Student ID: ${paymentProof.studentId}", style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text("Parcels: ${paymentProof.parcelIds.join(', ')}"),
+            Text("Parcel ID: ${paymentProof.parcelId}"),
             const SizedBox(height: 8),
             Text("Uploaded At: ${paymentProof.uploadedAt}"),
             const SizedBox(height: 8),
-            Text("Filename: ${paymentProof.fileName}"),
-            const SizedBox(height: 8),
-            Image.network(paymentProof.fileUrl, height: 150), // preview the receipt
+            Image.network(paymentProof.imageUrl, height: 150), // Preview the uploaded proof
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerRight,

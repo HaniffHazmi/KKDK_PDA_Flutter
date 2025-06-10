@@ -46,8 +46,10 @@ class ParcelService {
 
     return query.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
+        final docRef = FirebaseFirestore.instance.collection('parcels').doc(); // auto-ID
         final data = doc.data() as Map<String, dynamic>;
         return Parcel(
+          id: docRef.id,
           trackingNumber: data['trackingNumber'],
           name: data['name'],
           matricNumber: data['matricNumber'],

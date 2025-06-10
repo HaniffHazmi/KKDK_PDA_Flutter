@@ -46,12 +46,7 @@ class CartParcelList extends StatelessWidget {
             final parcel = parcels[index];
             return CartParcelTile(
               parcel: parcel,
-              onPay: () {
-                // Hook up navigation to payment or dummy confirmation
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Pay clicked for ${parcel.trackingNumber}')),
-                );
-              },
+
             );
           },
         );

@@ -42,6 +42,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
       }
 
       final newParcel = Parcel(
+        id: '',
         trackingNumber: _trackingNumberController.text.trim(),
         name: _nameController.text.trim(),
         matricNumber: _matricNumberController.text.trim(),
