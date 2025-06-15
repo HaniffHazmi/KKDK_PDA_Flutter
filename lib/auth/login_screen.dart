@@ -105,6 +105,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
+                SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/reset-password');
+                    },
+                    child: Text("Forgot Password?"),
+                  ),
+                ),
                 if (_errorMessage.isNotEmpty) ...[
                   SizedBox(height: 12),
                   Text(_errorMessage, style: TextStyle(color: Colors.red)),

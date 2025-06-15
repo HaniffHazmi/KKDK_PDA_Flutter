@@ -1,16 +1,31 @@
 import 'package:flutter/material.dart';
 import '../../widgets/admin_payment_parcel_list.dart';
-
-// This screen displays parcels that have been marked as 'found' and are waiting for student payment.
+import '../../widgets/admin_unpaid_parcel_list.dart';
 
 class ManagePaymentsScreen extends StatelessWidget {
   const ManagePaymentsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Manage Payments')),
-      body: const AdminPaymentParcelList(),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Manage Payments'),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'Awaiting Payment'),
+              Tab(text: 'To Verify'),
+            ],
+          ),
+        ),
+        body: const TabBarView(
+          children: [
+            AdminUnpaidParcelList(),
+            AdminPaymentParcelList(),
+          ],
+        ),
+      ),
     );
   }
 }

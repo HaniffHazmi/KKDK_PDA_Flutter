@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutterapp/auth/reset_password_screen.dart';
 import 'package:flutterapp/screens/admin/admin_dashboard_screen.dart';
 import 'auth/login_screen.dart';
 import 'auth/register_screen.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/login': (context) => LoginScreen(),
+        '/reset-password': (context) => ResetPasswordScreen(),
         '/register': (context) => RegisterScreen(),
         '/home': (context) => HomeScreen(),
         '/admin-dashboard': (context) => AdminDashboardScreen(), // New admin route
