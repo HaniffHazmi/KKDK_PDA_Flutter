@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/parcel_tile.dart';
-import '../models/parcel.dart'; // Make sure you import this to access enums and helpers
+import '../models/parcel.dart'; // For ParcelStatus and helpers
 
 class StudentParcelList extends StatelessWidget {
   const StudentParcelList({super.key});
@@ -12,7 +12,7 @@ class StudentParcelList extends StatelessWidget {
     final String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid == null) {
-      return Center(child: Text("User not logged in"));
+      return const Center(child: Text("User not logged in"));
     }
 
     return StreamBuilder<QuerySnapshot>(
@@ -27,14 +27,13 @@ class StudentParcelList extends StatelessWidget {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(child: Text("No parcels found"));
+          return const Center(child: Text("No parcels found"));
         }
 
-        // Filter only parcels with status == pending
         final pendingParcels = snapshot.data!.docs.where((doc) {
           final data = doc.data() as Map<String, dynamic>;
           final status = parcelStatusFromString(data['status'] ?? 'pending');
@@ -42,7 +41,7 @@ class StudentParcelList extends StatelessWidget {
         }).toList();
 
         if (pendingParcels.isEmpty) {
-          return Center(child: Text("No pending parcels"));
+          return const Center(child: Text("No pending parcels"));
         }
 
         return ListView.builder(
@@ -51,11 +50,17 @@ class StudentParcelList extends StatelessWidget {
             final parcel = pendingParcels[index];
             final data = parcel.data() as Map<String, dynamic>;
 
+            // Parse fields
+            final trackingNumber = data['trackingNumber'] ?? 'Unknown';
+            final courier = data['courier'] ?? 'Unknown';
+            final timestamp = data['dateArrived'] as Timestamp?;
+            final status = data['status'] ?? 'unknown';
+
             return ParcelTile(
-              trackingNumber: data['trackingNumber'],
-              college: data['college'],
-              roomNumber: data['roomNumber'],
-              status: data['status'] ?? 'unknown',
+              trackingNumber: trackingNumber,
+              courier: courier,
+              dateArrived: timestamp?.toDate() ?? DateTime.now(),
+              status: status,
             );
           },
         );
