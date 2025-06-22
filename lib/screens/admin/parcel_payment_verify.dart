@@ -14,8 +14,8 @@ class ParcelPaymentVerify extends StatefulWidget {
 
 class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
   PaymentProof? proof;
-  bool isLoading = true;
   Parcel? tiedParcel;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -30,13 +30,25 @@ class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
         .get();
 
     if (doc.exists) {
-      setState(() {
-        proof = PaymentProof.fromFirestore(doc);
-        isLoading = false;
-      });
-      debugPrint('✅ Loaded PaymentProof: ${proof!.toMap()}');
+      final loadedProof = PaymentProof.fromFirestore(doc);
+      final parcelDoc = await FirebaseFirestore.instance
+          .collection('parcels')
+          .doc(loadedProof.parcelId)
+          .get();
+
+      if (parcelDoc.exists) {
+        setState(() {
+          proof = loadedProof;
+          tiedParcel = Parcel.fromFirestore(parcelDoc);
+          isLoading = false;
+        });
+      } else {
+        debugPrint('❌ Parcel not found.');
+        setState(() => isLoading = false);
+      }
     } else {
       debugPrint("❌ PaymentProof not found.");
+      setState(() => isLoading = false);
     }
   }
 
@@ -44,29 +56,12 @@ class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
     if (proof == null) return;
 
     final batch = FirebaseFirestore.instance.batch();
-    debugPrint('🔍 Verifying parcel ID: ${proof!.parcelId}');
 
-    // Get parcel
-    final parcelDoc = await FirebaseFirestore.instance
-        .collection('parcels')
-        .doc(proof!.parcelId)
-        .get();
-
-    if (!parcelDoc.exists) {
-      debugPrint("❌ Parcel not found: ${proof!.parcelId}");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Parcel not found: ${proof!.parcelId}')),
-      );
-      return;
-    }
-
-    // 1. Mark payment as verified
     final paymentRef = FirebaseFirestore.instance
         .collection('payment_proofs')
         .doc(proof!.id);
     batch.update(paymentRef, {'isVerified': true});
 
-    // 2. Update parcel status to "inDelivery"
     final parcelRef = FirebaseFirestore.instance
         .collection('parcels')
         .doc(proof!.parcelId);
@@ -76,7 +71,7 @@ class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
 
     try {
       await batch.commit();
-      Navigator.pop(context); // Go back after approval
+      Navigator.pop(context);
     } catch (e) {
       debugPrint("❌ Error approving payment: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -92,7 +87,7 @@ class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
       await FirebaseFirestore.instance
           .collection('payment_proofs')
           .doc(proof!.id)
-          .delete(); // Or update with rejection flag
+          .delete();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Payment has been rejected.')),
@@ -125,12 +120,10 @@ class _ParcelPaymentVerifyState extends State<ParcelPaymentVerify> {
             const SizedBox(height: 8),
             Image.network(proof!.imageUrl, height: 250, fit: BoxFit.contain),
             const SizedBox(height: 16),
-            Text('Uploaded by: ${proof!.studentId}'),
+            Text('Name: ${tiedParcel?.name ?? "-"}'),
+            Text('Matric No: ${tiedParcel?.matricNumber ?? "-"}'),
+            Text('Tracking No: ${tiedParcel?.trackingNumber ?? "-"}'),
             Text('Uploaded at: ${proof!.uploadedAt.toLocal()}'),
-            const SizedBox(height: 16),
-            const Text('Associated Parcel:', style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text('• ${proof!.parcelId}'),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -1,5 +1,3 @@
-// widgets/delivery_parcel_tile.dart
-
 import 'package:flutter/material.dart';
 import '../models/delivery_parcel.dart';
 import '../models/parcel.dart'; // for ParcelStatus and conversion functions
@@ -7,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DeliveryParcelTile extends StatelessWidget {
   final DeliveryParcel parcel;
-  final VoidCallback? onStatusUpdated; // optional callback to refresh parent widget
+  final VoidCallback? onStatusUpdated;
 
   const DeliveryParcelTile({
     super.key,
@@ -34,17 +32,18 @@ class DeliveryParcelTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final address = '${parcel.block.name}-${parcel.level.value}-${parcel.roomNumber}';
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
-        title: Text(parcel.trackingNumber),
+        title: Text(parcel.trackingNumber, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Name: ${parcel.name}'),
             Text('Matric: ${parcel.matricNumber}'),
-            Text('Courier: ${parcel.courier.name}'),
-            Text('Status: ${parcelStatusToString(parcel.status)}'),
+            Text('College: ${parcel.college.name}'),
+            Text('Address: $address'),
           ],
         ),
         trailing: parcel.status == ParcelStatus.inDelivery

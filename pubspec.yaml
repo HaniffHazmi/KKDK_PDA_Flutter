@@ -41,6 +41,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   image_picker: ^1.1.2
   path: ^1.9.1
+  file_picker: ^10.2.0
 
 
 
