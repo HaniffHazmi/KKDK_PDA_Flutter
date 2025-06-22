@@ -16,7 +16,7 @@ class AdminParcelList extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('parcels')
-          .where('status',isEqualTo: 'pending')
+          .where('status', isEqualTo: 'pending')
           .orderBy('createdAt', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
@@ -25,11 +25,11 @@ class AdminParcelList extends StatelessWidget {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(child: Text("No parcels found"));
+          return const Center(child: Text("No parcels found"));
         }
 
         final parcelDocs = snapshot.data!.docs;
@@ -61,3 +61,4 @@ class AdminParcelList extends StatelessWidget {
     );
   }
 }
+

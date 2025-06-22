@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-//This is the AdminParcelTile used by AdminParcelList
-
 class AdminParcelTile extends StatelessWidget {
   final String trackingNumber;
   final String college;
@@ -20,21 +18,59 @@ class AdminParcelTile extends StatelessWidget {
     required this.onTap,
   });
 
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return Colors.orange;
+      case 'found':
+        return Colors.green;
+      case 'inDelivery':
+        return Colors.blue;
+      case 'delivered':
+        return Colors.grey;
+      default:
+        return Colors.black;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(trackingNumber),
-      subtitle: Text('$college - Block $block\nMatric: $matricNumber'),
-      trailing: Text(
-        status,
-        style: TextStyle(
-          color: status == 'pending' ? Colors.orange :
-          status == 'found' ? Colors.green :
-          Colors.grey,
+    return Card(
+      elevation: 3,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Left Column
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tracking #: $trackingNumber',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 6),
+                  Text('College: $college • Block $block'),
+                  Text('Matric No: $matricNumber'),
+                ],
+              ),
+
+              // Right: Status Chip
+              Chip(
+                label: Text(status),
+                backgroundColor: _getStatusColor(status),
+
+              ),
+            ],
+          ),
         ),
       ),
-      isThreeLine: true,
-      onTap: onTap,
     );
   }
 }

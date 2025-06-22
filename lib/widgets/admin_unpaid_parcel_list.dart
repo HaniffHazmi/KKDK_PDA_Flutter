@@ -31,7 +31,6 @@ class AdminUnpaidParcelList extends StatelessWidget {
             final proofs = proofSnapshot.data!.docs.map((doc) => PaymentProof.fromFirestore(doc)).toList();
             final paidParcelIds = proofs.map((e) => e.parcelId).toSet();
 
-            // Filter unpaid only
             final unpaidDocs = parcelDocs.where((doc) => !paidParcelIds.contains(doc.id)).toList();
             final unpaidParcels = unpaidDocs.map((doc) => AdminParcel.fromFirestore(doc)).toList();
 
