@@ -16,10 +16,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    StudentParcelList(),
-    ParcelFormScreen(), // Placeholder
-    CartScreen(),
-    SettingScreen(),
+    const StudentParcelList(), // Home
+    const CartScreen(),        // Payment
+    const SettingScreen(),     // Settings
   ];
 
   void _onNavTapped(int index) {
@@ -31,11 +30,23 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: _pages[_selectedIndex],
+      floatingActionButton: _selectedIndex == 0
+          ? FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ParcelFormScreen()),
+          );
+        },
+        icon: const Icon(Icons.add),
+        label: const Text("Submit Parcel"),
+      )
+          : null,
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _selectedIndex,
         onTap: _onNavTapped,
+        showFormTab: false,
       ),
     );
   }

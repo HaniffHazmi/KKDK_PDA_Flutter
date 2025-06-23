@@ -1,14 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/payment_proof.dart';
 import '../screens/admin/parcel_payment_verify.dart';
 
-class AdminPaymentParcelTile extends StatelessWidget {
+class AdminPaymentParcelTile extends StatefulWidget {
   final PaymentProof paymentProof;
 
   const AdminPaymentParcelTile({super.key, required this.paymentProof});
 
   @override
+  State<AdminPaymentParcelTile> createState() => _AdminPaymentParcelTileState();
+}
+
+class _AdminPaymentParcelTileState extends State<AdminPaymentParcelTile> {
+  String studentName = '';
+  String studentMatric = '';
+  String trackingNumber = '';
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLinkedData();
+  }
+
+  Future<void> _loadLinkedData() async {
+    try {
+      // Load parcel details
+      final parcelDoc = await FirebaseFirestore.instance
+          .collection('parcels')
+          .doc(widget.paymentProof.parcelId)
+          .get();
+
+      if (parcelDoc.exists) {
+        final parcelData = parcelDoc.data()!;
+        trackingNumber = parcelData['trackingNumber'] ?? '';
+        studentMatric = parcelData['matricNumber'] ?? '';
+        studentName = parcelData['name'] ?? '';
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('❌ Error loading linked data: $e');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Padding(
@@ -16,13 +60,13 @@ class AdminPaymentParcelTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Student ID: ${paymentProof.studentId}", style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text("Name: $studentName", style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text("Matric No: $studentMatric"),
+            Text("Tracking #: $trackingNumber"),
             const SizedBox(height: 8),
-            Text("Parcel ID: ${paymentProof.parcelId}"),
+            Text("Uploaded At: ${widget.paymentProof.uploadedAt.toLocal()}"),
             const SizedBox(height: 8),
-            Text("Uploaded At: ${paymentProof.uploadedAt}"),
-            const SizedBox(height: 8),
-            Image.network(paymentProof.imageUrl, height: 150), // Preview the uploaded proof
+            Image.network(widget.paymentProof.imageUrl, height: 150, fit: BoxFit.cover),
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerRight,
@@ -31,7 +75,7 @@ class AdminPaymentParcelTile extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ParcelPaymentVerify(paymentProofId: paymentProof.id),
+                      builder: (_) => ParcelPaymentVerify(paymentProofId: widget.paymentProof.id),
                     ),
                   );
                 },

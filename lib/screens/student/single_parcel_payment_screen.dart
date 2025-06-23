@@ -18,6 +18,36 @@ class SingleParcelPaymentScreen extends StatefulWidget {
 class _SingleParcelPaymentScreenState extends State<SingleParcelPaymentScreen> {
   File? _selectedImage;
   bool _isUploading = false;
+  String? _existingImageUrl;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkExistingProof();
+  }
+
+  Future<void> _checkExistingProof() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+    final query = await FirebaseFirestore.instance
+        .collection('payment_proofs')
+        .where('studentId', isEqualTo: uid)
+        .where('parcelId', isEqualTo: widget.parcelId)
+        .limit(1)
+        .get();
+
+    if (query.docs.isNotEmpty) {
+      setState(() {
+        _existingImageUrl = query.docs.first['imageUrl'];
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -55,6 +85,12 @@ class _SingleParcelPaymentScreenState extends State<SingleParcelPaymentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Payment proof uploaded successfully!')),
       );
+
+      setState(() {
+        _existingImageUrl = downloadUrl;
+        _selectedImage = null;
+      });
+
       Navigator.pop(context);
     } catch (e) {
       debugPrint('❌ Upload failed: $e');
@@ -68,6 +104,12 @@ class _SingleParcelPaymentScreenState extends State<SingleParcelPaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Upload Payment Proof')),
       body: Padding(
@@ -84,24 +126,32 @@ class _SingleParcelPaymentScreenState extends State<SingleParcelPaymentScreen> {
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: _pickImage,
-              icon: const Icon(Icons.image),
-              label: const Text('Select Receipt Image'),
-            ),
-            if (_selectedImage != null) ...[
-              const SizedBox(height: 12),
-              Center(child: Image.file(_selectedImage!, height: 150)),
-            ],
-            const SizedBox(height: 24),
-            Center(
-              child: ElevatedButton(
-                onPressed: _selectedImage == null || _isUploading ? null : _uploadProof,
-                child: _isUploading
-                    ? const CircularProgressIndicator()
-                    : const Text('Upload Proof & Confirm Payment'),
+            if (_existingImageUrl != null) ...[
+              const Text("You’ve already uploaded a proof:"),
+              const SizedBox(height: 8),
+              Center(child: Image.network(_existingImageUrl!, height: 200)),
+              const SizedBox(height: 16),
+              const Text("Waiting for admin verification...", style: TextStyle(color: Colors.green)),
+            ] else ...[
+              ElevatedButton.icon(
+                onPressed: _pickImage,
+                icon: const Icon(Icons.image),
+                label: const Text('Select Receipt Image'),
               ),
-            ),
+              if (_selectedImage != null) ...[
+                const SizedBox(height: 12),
+                Center(child: Image.file(_selectedImage!, height: 150)),
+              ],
+              const SizedBox(height: 24),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _selectedImage == null || _isUploading ? null : _uploadProof,
+                  child: _isUploading
+                      ? const CircularProgressIndicator()
+                      : const Text('Upload Proof & Confirm Payment'),
+                ),
+              ),
+            ],
           ],
         ),
       ),

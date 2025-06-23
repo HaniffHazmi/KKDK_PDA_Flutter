@@ -69,6 +69,7 @@ flutter_launcher_icons:
 flutter:
   assets:
     - assets/QR_Payment.jpg
+    - assets/icons/logo_kkdk.jpg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -7,6 +7,17 @@ import 'cart_parcel_tile.dart';
 class CartParcelList extends StatelessWidget {
   const CartParcelList({super.key});
 
+  Future<List<String>> _getParcelIdsWithProof(String uid) async {
+    final proofSnapshot = await FirebaseFirestore.instance
+        .collection('payment_proofs')
+        .where('studentId', isEqualTo: uid)
+        .get();
+
+    return proofSnapshot.docs
+        .map((doc) => doc['parcelId'] as String)
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -15,38 +26,43 @@ class CartParcelList extends StatelessWidget {
       return const Center(child: Text('User not logged in.'));
     }
 
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('parcels')
-          .where('userId', isEqualTo: currentUser.uid)
-          .where('status', isEqualTo: 'found') // Must match how you store enum in Firestore
-          .orderBy('createdAt', descending: true)
-          .snapshots(),
+    return FutureBuilder<List<String>>(
+      future: _getParcelIdsWithProof(currentUser.uid),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text("No found parcels to pay for."));
-        }
+        final paidParcelIds = snapshot.data ?? [];
 
-        final parcelDocs = snapshot.data!.docs;
-        final parcels = parcelDocs
-            .map((doc) => Parcel.fromFirestore(doc))
-            .toList();
+        return StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('parcels')
+              .where('userId', isEqualTo: currentUser.uid)
+              .where('status', isEqualTo: 'found')
+              .orderBy('createdAt', descending: true)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
 
-        return ListView.builder(
-          itemCount: parcels.length,
-          itemBuilder: (context, index) {
-            final parcel = parcels[index];
-            return CartParcelTile(
-              parcel: parcel,
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Center(child: Text("No found parcels to pay for."));
+            }
 
+            final parcels = snapshot.data!.docs
+                .map((doc) => Parcel.fromFirestore(doc))
+                .where((parcel) => !paidParcelIds.contains(parcel.id)) // exclude paid
+                .toList();
+
+            if (parcels.isEmpty) {
+              return const Center(child: Text("No unpaid parcels."));
+            }
+
+            return ListView.builder(
+              itemCount: parcels.length,
+              itemBuilder: (context, index) => CartParcelTile(parcel: parcels[index]),
             );
           },
         );

@@ -15,7 +15,6 @@ class _StudentEditProfileScreenState extends State<StudentEditProfileScreen> {
   StudentUser? student;
   bool isLoading = true;
 
-  // Editable fields
   late String phone;
   late String college;
   late String block;
@@ -63,7 +62,7 @@ class _StudentEditProfileScreenState extends State<StudentEditProfileScreen> {
     );
 
     await FirebaseFirestore.instance
-        .collection('students')
+        .collection('users') // <- ensure this matches your Firestore setup
         .doc(updated.uid)
         .update(updated.toMap());
 
@@ -74,95 +73,104 @@ class _StudentEditProfileScreenState extends State<StudentEditProfileScreen> {
     Navigator.pop(context);
   }
 
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Edit Profile')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              // Non-editable fields
               TextFormField(
                 initialValue: student!.name,
-                decoration: const InputDecoration(labelText: 'Name'),
                 readOnly: true,
+                decoration: _inputDecoration('Name'),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 initialValue: student!.matricNo,
-                decoration: const InputDecoration(labelText: 'Matric No'),
                 readOnly: true,
+                decoration: _inputDecoration('Matric Number'),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 initialValue: student!.email,
-                decoration: const InputDecoration(labelText: 'Email'),
                 readOnly: true,
+                decoration: _inputDecoration('Email'),
               ),
               const SizedBox(height: 16),
 
-              // Editable fields
               TextFormField(
                 initialValue: phone,
-                decoration: const InputDecoration(labelText: 'Phone Number'),
                 keyboardType: TextInputType.phone,
+                decoration: _inputDecoration('Phone Number'),
                 onSaved: (val) => phone = val!,
                 validator: (val) => val == null || val.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
+
               DropdownButtonFormField<String>(
                 value: college,
-                decoration: const InputDecoration(labelText: 'College'),
+                decoration: _inputDecoration('College'),
                 items: ['TDI', 'TF']
                     .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                     .toList(),
                 onChanged: (val) => college = val!,
               ),
               const SizedBox(height: 16),
+
               DropdownButtonFormField<String>(
                 value: block,
-                decoration: const InputDecoration(labelText: 'Block'),
+                decoration: _inputDecoration('Block'),
                 items: ['A', 'B', 'C', 'D']
                     .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                     .toList(),
                 onChanged: (val) => block = val!,
               ),
               const SizedBox(height: 16),
+
               DropdownButtonFormField<int>(
                 value: level,
-                decoration: const InputDecoration(labelText: 'Level'),
-                items: List.generate(
-                    4, (i) => DropdownMenuItem(value: i, child: Text('Level $i'))),
+                decoration: _inputDecoration('Level'),
+                items: List.generate(4, (i) => DropdownMenuItem(value: i, child: Text('Level $i'))),
                 onChanged: (val) => level = val!,
               ),
               const SizedBox(height: 16),
+
               DropdownButtonFormField<int>(
                 value: roomNumber,
-                decoration: const InputDecoration(labelText: 'Room Number'),
-                items: List.generate(
-                    16, (i) => DropdownMenuItem(value: i + 1, child: Text('Room ${i + 1}'))),
+                decoration: _inputDecoration('Room Number'),
+                items: List.generate(16, (i) => DropdownMenuItem(value: i + 1, child: Text('Room ${i + 1}'))),
                 onChanged: (val) => roomNumber = val!,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
-              // Save button
-              ElevatedButton(
-                onPressed: _saveProfile,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _saveProfile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text('Save Changes', style: TextStyle(fontSize: 16)),
                 ),
-                child: const Text('Save Changes', style: TextStyle(fontSize: 16)),
               ),
             ],
           ),

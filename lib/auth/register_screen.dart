@@ -1,5 +1,3 @@
-//This is register screen for user.
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -57,9 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         Navigator.pushReplacementNamed(context, '/home');
       } catch (e) {
-        setState(() {
-          _errorMessage = e.toString();
-        });
+        setState(() => _errorMessage = e.toString());
       }
     }
   }
@@ -67,8 +63,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       isDense: true,
-      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       labelStyle: TextStyle(fontSize: 13),
     );
   }
@@ -77,116 +74,163 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(title: Text('Register')),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          child: Form(
-            key: _formKey,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 400),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Create Account', style: theme.textTheme.headlineSmall?.copyWith(fontSize: 20)),
-                  SizedBox(height: 20),
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacementNamed(context, '/login');
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Register'),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Form(
+              key: _formKey,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 420),
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            'Create Your KKDK PDA Account',
+                            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
 
-                  TextFormField(
-                    controller: nameController,
-                    decoration: _inputDecoration('Full Name'),
-                    validator: (val) => val!.isEmpty ? 'Enter name' : null,
-                  ),
-                  SizedBox(height: 10),
+                        TextFormField(
+                          controller: nameController,
+                          decoration: _inputDecoration('Full Name'),
+                          validator: (val) => val!.isEmpty ? 'Enter name' : null,
+                        ),
+                        const SizedBox(height: 12),
 
-                  TextFormField(
-                    controller: matricNoController,
-                    decoration: _inputDecoration('Matric Number'),
-                    validator: (val) => val!.isEmpty ? 'Enter matric no' : null,
-                  ),
-                  SizedBox(height: 10),
+                        TextFormField(
+                          controller: matricNoController,
+                          decoration: _inputDecoration('Matric Number'),
+                          validator: (val) => val!.isEmpty ? 'Enter matric no' : null,
+                        ),
+                        const SizedBox(height: 12),
 
-                  TextFormField(
-                    controller: phoneController,
-                    decoration: _inputDecoration('Phone Number'),
-                    validator: (val) => val!.isEmpty ? 'Enter phone number' : null,
-                  ),
-                  SizedBox(height: 10),
+                        TextFormField(
+                          controller: phoneController,
+                          decoration: _inputDecoration('Phone Number'),
+                          validator: (val) => val!.isEmpty ? 'Enter phone number' : null,
+                        ),
+                        const SizedBox(height: 16),
 
-                  DropdownButtonFormField(
-                    value: selectedCollege,
-                    items: ['TDI', 'TF'].map((c) => DropdownMenuItem(value: c, child: Text(c, style: TextStyle(fontSize: 13)))).toList(),
-                    onChanged: (val) => setState(() => selectedCollege = val as String),
-                    decoration: _inputDecoration('College'),
-                  ),
-                  SizedBox(height: 10),
+                        Divider(),
+                        const Text('Residence Info', style: TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 12),
 
-                  DropdownButtonFormField(
-                    value: selectedBlock,
-                    items: ['A', 'B', 'C', 'D'].map((b) => DropdownMenuItem(value: b, child: Text(b, style: TextStyle(fontSize: 13)))).toList(),
-                    onChanged: (val) => setState(() => selectedBlock = val as String),
-                    decoration: _inputDecoration('Block'),
-                  ),
-                  SizedBox(height: 10),
+                        DropdownButtonFormField(
+                          value: selectedCollege,
+                          decoration: _inputDecoration('College'),
+                          items: ['TDI', 'TF']
+                              .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                              .toList(),
+                          onChanged: (val) => setState(() => selectedCollege = val as String),
+                        ),
+                        const SizedBox(height: 12),
 
-                  DropdownButtonFormField(
-                    value: selectedLevel,
-                    items: List.generate(4, (i) => DropdownMenuItem(value: i, child: Text('Level $i', style: TextStyle(fontSize: 13)))),
-                    onChanged: (val) => setState(() => selectedLevel = val as int),
-                    decoration: _inputDecoration('Level'),
-                  ),
-                  SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButtonFormField(
+                                value: selectedBlock,
+                                decoration: _inputDecoration('Block'),
+                                items: ['A', 'B', 'C', 'D']
+                                    .map((b) => DropdownMenuItem(value: b, child: Text(b)))
+                                    .toList(),
+                                onChanged: (val) => setState(() => selectedBlock = val as String),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: DropdownButtonFormField(
+                                value: selectedLevel,
+                                decoration: _inputDecoration('Level'),
+                                items: List.generate(4, (i) =>
+                                    DropdownMenuItem(value: i, child: Text('L$i'))),
+                                onChanged: (val) => setState(() => selectedLevel = val as int),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: DropdownButtonFormField(
+                                value: selectedRoom,
+                                decoration: _inputDecoration('Room'),
+                                items: List.generate(16, (i) =>
+                                    DropdownMenuItem(value: i + 1, child: Text('${i + 1}'))),
+                                onChanged: (val) => setState(() => selectedRoom = val as int),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
 
-                  DropdownButtonFormField(
-                    value: selectedRoom,
-                    items: List.generate(16, (i) => DropdownMenuItem(value: i + 1, child: Text('Room ${i + 1}', style: TextStyle(fontSize: 13)))),
-                    onChanged: (val) => setState(() => selectedRoom = val as int),
-                    decoration: _inputDecoration('Room Number'),
-                  ),
-                  SizedBox(height: 10),
+                        Divider(),
+                        const Text('Login Credentials', style: TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 12),
 
-                  TextFormField(
-                    controller: emailController,
-                    decoration: _inputDecoration('Email'),
-                    validator: (val) => val != null &&
-                        RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(val)
-                        ? null
-                        : 'Enter valid email',
-                  ),
-                  SizedBox(height: 10),
+                        TextFormField(
+                          controller: emailController,
+                          decoration: _inputDecoration('Gmail Address'),
+                          validator: (val) {
+                            if (val == null || val.isEmpty) return 'Enter email';
+                            final isValid = RegExp(r"^[\w-\.]+@gmail\.com$").hasMatch(val);
+                            return isValid ? null : 'Only Gmail (@gmail.com) addresses allowed';
+                          },
+                        ),
+                        const SizedBox(height: 12),
 
-                  TextFormField(
-                    controller: passwordController,
-                    obscureText: _obscurePassword,
-                    decoration: _inputDecoration('Password').copyWith(
-                      suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                      ),
+                        TextFormField(
+                          controller: passwordController,
+                          obscureText: _obscurePassword,
+                          decoration: _inputDecoration('Password').copyWith(
+                            suffixIcon: IconButton(
+                              icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                            ),
+                          ),
+                          validator: (val) =>
+                          val != null && val.length >= 8 && RegExp(r'(?=.*[A-Za-z])(?=.*\d)').hasMatch(val)
+                              ? null
+                              : 'Min 8 chars, include letters and numbers',
+                        ),
+
+                        if (_errorMessage.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(_errorMessage, style: TextStyle(color: Colors.red, fontSize: 12)),
+                          ),
+                        const SizedBox(height: 20),
+
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: Icon(Icons.check),
+                            onPressed: _register,
+                            label: const Text('Register'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    validator: (val) =>
-                    val != null &&
-                        val.length >= 8 &&
-                        RegExp(r'(?=.*[A-Za-z])(?=.*\d)').hasMatch(val)
-                        ? null
-                        : 'Min 8 chars, include letters and numbers',
                   ),
-
-                  if (_errorMessage.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(_errorMessage, style: TextStyle(color: Colors.red, fontSize: 12)),
-                    ),
-                  SizedBox(height: 16),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _register,
-                      child: Text('Register'),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

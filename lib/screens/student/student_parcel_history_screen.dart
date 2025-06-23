@@ -4,8 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../models/parcel.dart';
 import '../../widgets/student_parcel_history_tile.dart';
 
-class StudentParcelHistoryScreen extends StatelessWidget {
+class StudentParcelHistoryScreen extends StatefulWidget {
   const StudentParcelHistoryScreen({super.key});
+
+  @override
+  State<StudentParcelHistoryScreen> createState() => _StudentParcelHistoryScreenState();
+}
+
+class _StudentParcelHistoryScreenState extends State<StudentParcelHistoryScreen> {
+  String _searchTerm = '';
 
   @override
   Widget build(BuildContext context) {
@@ -13,29 +20,50 @@ class StudentParcelHistoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Parcel History')),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('parcels')
-            .where('userId', isEqualTo: userId)
-            .where('status', isEqualTo: parcelStatusToString(ParcelStatus.delivered))
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search by Tracking Number',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onChanged: (value) => setState(() => _searchTerm = value.trim().toLowerCase()),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('parcels')
+                  .where('userId', isEqualTo: userId)
+                  .where('status', isEqualTo: parcelStatusToString(ParcelStatus.delivered))
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          final parcels = snapshot.data!.docs.map((doc) => Parcel.fromFirestore(doc)).toList();
+                final allParcels = snapshot.data!.docs.map((doc) => Parcel.fromFirestore(doc)).toList();
 
-          if (parcels.isEmpty) {
-            return const Center(child: Text('No delivered parcels found.'));
-          }
+                final filteredParcels = allParcels.where((p) =>
+                    p.trackingNumber.toLowerCase().contains(_searchTerm)
+                ).toList();
 
-          return ListView.builder(
-            itemCount: parcels.length,
-            itemBuilder: (context, index) => StudentParcelHistoryTile(parcel: parcels[index]),
-          );
-        },
+                if (filteredParcels.isEmpty) {
+                  return const Center(child: Text('No delivered parcels found.'));
+                }
+
+                return ListView.builder(
+                  itemCount: filteredParcels.length,
+                  itemBuilder: (context, index) => StudentParcelHistoryTile(parcel: filteredParcels[index]),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

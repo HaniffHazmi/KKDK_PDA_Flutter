@@ -89,7 +89,7 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
   }
 
   Widget _buildFormField(Widget child) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
+    padding: const EdgeInsets.symmetric(vertical: 10),
     child: child,
   );
 
@@ -97,61 +97,58 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
   Widget build(BuildContext context) {
     if (_student == null) {
       return Scaffold(
-        appBar: AppBar(title: Text('Submit Parcel')),
-        body: Center(child: CircularProgressIndicator()),
+        appBar: AppBar(title: const Text('Submit Parcel')),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Submit Parcel')),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+      appBar: AppBar(title: const Text('Submit Parcel')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 400),
+            constraints: const BoxConstraints(maxWidth: 500),
             child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 3,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Form(
                   key: _formKey,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      Text('Parcel Details', style: Theme.of(context).textTheme.titleLarge),
+                      const SizedBox(height: 16),
+
                       _buildFormField(TextFormField(
                         controller: _trackingNumberController,
-                        decoration: InputDecoration(labelText: 'Tracking Number'),
+                        decoration: const InputDecoration(
+                          labelText: 'Tracking Number',
+                          border: OutlineInputBorder(),
+                        ),
                         validator: (value) => value!.isEmpty ? 'Required' : null,
                       )),
-                      _buildFormField(TextFormField(
-                        initialValue: _student!.name,
-                        decoration: InputDecoration(labelText: 'Name'),
-                        enabled: false,
-                      )),
-                      _buildFormField(TextFormField(
-                        initialValue: _student!.matricNo,
-                        decoration: InputDecoration(labelText: 'Matric Number'),
-                        enabled: false,
-                      )),
-                      _buildFormField(TextFormField(
-                        initialValue: _student!.phoneNumber,
-                        decoration: InputDecoration(labelText: 'Phone Number'),
-                        enabled: false,
-                      )),
-                      _buildFormField(TextFormField(
-                        initialValue: _student!.roomNumber.toString(),
-                        decoration: InputDecoration(labelText: 'Room Number'),
-                        enabled: false,
-                      )),
+
+                      _buildFormField(_buildReadOnlyField('Name', _student!.name)),
+                      _buildFormField(_buildReadOnlyField('Matric Number', _student!.matricNo)),
+                      _buildFormField(_buildReadOnlyField('Phone Number', _student!.phoneNumber)),
+                      _buildFormField(_buildReadOnlyField('Room Number', _student!.roomNumber.toString())),
+
                       _buildFormField(DropdownButtonFormField<Courier>(
                         value: _selectedCourier,
-                        decoration: InputDecoration(labelText: 'Courier'),
-                        items: Courier.values.map((c) {
-                          return DropdownMenuItem(value: c, child: Text(c.name));
-                        }).toList(),
+                        decoration: const InputDecoration(
+                          labelText: 'Courier',
+                          border: OutlineInputBorder(),
+                        ),
+                        items: Courier.values
+                            .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
+                            .toList(),
                         onChanged: (val) => setState(() => _selectedCourier = val),
                         validator: (val) => val == null ? 'Required' : null,
                       )),
+
                       _buildFormField(GestureDetector(
                         onTap: () async {
                           DateTime? picked = await showDatePicker(
@@ -166,9 +163,10 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                         },
                         child: AbsorbPointer(
                           child: TextFormField(
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               labelText: 'Date Arrived',
                               hintText: 'Select date',
+                              border: OutlineInputBorder(),
                             ),
                             controller: TextEditingController(
                               text: _selectedDate != null
@@ -180,16 +178,29 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
                           ),
                         ),
                       )),
-                      SizedBox(height: 20),
-                      ElevatedButton(
+
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
                         onPressed: _isSubmitting ? null : _submitForm,
+                        icon: _isSubmitting
+                            ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                            : const Icon(Icons.send),
+                        label: const Text('Submit Parcel'),
                         style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 48),
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          textStyle: const TextStyle(fontSize: 16),
+                          minimumSize: const Size.fromHeight(50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                        child: _isSubmitting
-                            ? CircularProgressIndicator()
-                            : Text('Submit Parcel'),
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -197,6 +208,19 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildReadOnlyField(String label, String value) {
+    return TextFormField(
+      initialValue: value,
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+        filled: true,
+        fillColor: Colors.grey.shade100,
       ),
     );
   }

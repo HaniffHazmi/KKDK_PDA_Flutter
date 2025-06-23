@@ -78,13 +78,19 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: Image.asset(
+                    'assets/icons/logo_kkdk.jpg', // 👈 replace with your actual path
+                    height: 100,
+                  ),
+                ),
                 Text(
                   'Welcome Back!',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Log in to continue',
+                  'Log in',
                   style: TextStyle(color: Colors.grey[600]),
                 ),
                 SizedBox(height: 32),
@@ -138,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       Navigator.pushReplacementNamed(context, '/register');
                     },
-                    child: Text("Don't have an account? Register"),
+                    child: Text("Register Account"),
                   ),
                 ),
               ],
