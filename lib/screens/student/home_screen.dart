@@ -30,6 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text('Home'),
+      actions: [
+        IconButton(onPressed: (){
+          Navigator.push(context, MaterialPageRoute(builder: (_) => SettingScreen()));
+        } , icon: const Icon(Icons.settings))
+      ],),
       body: _pages[_selectedIndex],
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton.extended(
@@ -43,11 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
         label: const Text("Submit Parcel"),
       )
           : null,
-      bottomNavigationBar: AppBottomNavBar(
+      /*bottomNavigationBar: AppBottomNavBar(
         currentIndex: _selectedIndex,
         onTap: _onNavTapped,
         showFormTab: false,
-      ),
+      ),*/
     );
   }
 }

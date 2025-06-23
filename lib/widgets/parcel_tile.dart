@@ -1,4 +1,3 @@
-// lib/widgets/parcel_tile.dart
 import 'package:flutter/material.dart';
 
 class ParcelTile extends StatelessWidget {
@@ -6,6 +5,8 @@ class ParcelTile extends StatelessWidget {
   final String courier;
   final DateTime dateArrived;
   final String status;
+  final VoidCallback? onPay; // Only used for 'found'
+  final bool isPaid; // Whether payment proof already exists
 
   const ParcelTile({
     super.key,
@@ -13,7 +14,24 @@ class ParcelTile extends StatelessWidget {
     required this.courier,
     required this.dateArrived,
     required this.status,
+    this.onPay,
+    this.isPaid = false,
   });
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return Colors.orange;
+      case 'found':
+        return Colors.green;
+      case 'indelivery':
+        return Colors.blue;
+      case 'delivered':
+        return Colors.grey;
+      default:
+        return Colors.black;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +49,7 @@ class ParcelTile extends StatelessWidget {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
-            Text(
-              'Courier: $courier',
-              style: const TextStyle(fontSize: 14),
-            ),
+            Text('Courier: $courier', style: const TextStyle(fontSize: 14)),
             Text(
               'Arrived: ${dateArrived.day}/${dateArrived.month}/${dateArrived.year}',
               style: const TextStyle(fontSize: 14),
@@ -43,7 +58,7 @@ class ParcelTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.orange,
+                color: _getStatusColor(status),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -55,6 +70,19 @@ class ParcelTile extends StatelessWidget {
                 ),
               ),
             ),
+            if (status.toLowerCase() == 'found') ...[
+              const SizedBox(height: 12),
+              isPaid
+                  ? const Text(
+                'Waiting for admin verification...',
+                style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500),
+              )
+                  : ElevatedButton.icon(
+                onPressed: onPay,
+                icon: const Icon(Icons.payment),
+                label: const Text('Pay Now'),
+              ),
+            ]
           ],
         ),
       ),

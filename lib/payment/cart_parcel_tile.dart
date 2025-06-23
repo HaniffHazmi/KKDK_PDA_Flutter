@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterapp/screens/student/single_parcel_payment_screen.dart';
 import '../../models/parcel.dart';
-import '../../student/single_parcel_payment_screen.dart';
+
 
 class CartParcelTile extends StatelessWidget {
   final Parcel parcel;

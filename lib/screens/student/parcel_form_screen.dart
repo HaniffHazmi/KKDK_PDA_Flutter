@@ -52,7 +52,9 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
 
       final user = FirebaseAuth.instance.currentUser;
       if (user == null || _student == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('User not logged in or student data missing')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User not logged in or student data missing')),
+        );
         setState(() => _isSubmitting = false);
         return;
       }
@@ -73,20 +75,35 @@ class _ParcelFormScreenState extends State<ParcelFormScreen> {
 
       try {
         await _parcelService.addParcel(newParcel);
+
+        // Clear the form
         _formKey.currentState?.reset();
         _trackingNumberController.clear();
         setState(() {
           _selectedCourier = null;
           _selectedDate = null;
         });
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Parcel submitted successfully')));
+
+        // Show success
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Parcel submitted successfully')),
+        );
+
+        // ✅ Navigate to HomeScreen
+        if (mounted) {
+          Navigator.pop(context); // Go back to home screen in bottom nav
+        }
+
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: $e')),
+        );
       } finally {
         setState(() => _isSubmitting = false);
       }
     }
   }
+
 
   Widget _buildFormField(Widget child) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 10),
