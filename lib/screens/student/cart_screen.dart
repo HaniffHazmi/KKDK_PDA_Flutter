@@ -23,7 +23,7 @@ class CartScreen extends StatelessWidget {
             },
             child: const Text(
               'Track Parcel',
-              style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white   , fontWeight: FontWeight.bold),
             ),
           ),
         ],
