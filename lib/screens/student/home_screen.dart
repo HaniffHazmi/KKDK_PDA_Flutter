@@ -21,11 +21,11 @@ class _HomeScreenState extends State<HomeScreen> {
     const SettingScreen(),     // Settings
   ];
 
-  void _onNavTapped(int index) {
+  /*void _onNavTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {

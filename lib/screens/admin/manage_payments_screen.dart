@@ -12,6 +12,8 @@ class ManagePaymentsScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           bottom: const TabBar(
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white24,
             tabs: [
               Tab(text: 'Awaiting Payment'),
               Tab(text: 'To Verify'),
